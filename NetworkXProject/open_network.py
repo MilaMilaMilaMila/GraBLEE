@@ -1,6 +1,10 @@
 import py4cytoscape as p4c
 import networkx as nx
 from datetime import datetime
+import os
+import multiprocessing
+import requests.exceptions
+
 
 
 def save_graph_as_cytoscape_file(nx_graph, file_format='gml', file_name=None):
@@ -17,7 +21,12 @@ def save_graph_as_cytoscape_file(nx_graph, file_format='gml', file_name=None):
     return f'{file_name}.{file_format}'
 
 
-def show_graph_in_cytoscape(nx_graph, file_format='gml', file_name=None):
+def run_cytoscape():
+    os.system('run_cs_cmd.py')
+
+
+# function work if cytoscape is opened
+def open_network(nx_graph, file_format='gml', file_name=None):
     # save graph in file with selected format to open in cytoscape
     file_path = save_graph_as_cytoscape_file(nx_graph, file_format, file_name)
     p4c.import_network_from_file(file_path)
@@ -31,12 +40,35 @@ def show_graph_in_cytoscape(nx_graph, file_format='gml', file_name=None):
     p4c.delete_network(suid)
 
 
+# function check - is cytoscape opened
+# If not - cytoscape will be opened
+def show_network_in_cytoscape(nx_graph, file_format='gml', file_name=None):
+    if __name__ == '__main__':
+        try:
+            p4c.cytoscape_ping()
+        except requests.exceptions.RequestException:
+            process1 = multiprocessing.Process(target=run_cytoscape)
+            process1.start()
+
+        flag = 1
+        while flag:
+            try:
+                flag = 0
+                p4c.cytoscape_ping()
+            except requests.exceptions.RequestException:
+                flag = 1
+
+        open_network(nx_graph, file_format=file_format, file_name=file_name)
+
+
 # example
-G = nx.Graph()
-G.add_edge(1, 2)
-G.add_edge(1, 3)
-G.add_edge(1, 5)
-G.add_edge(2, 3)
-G.add_edge(3, 4)
-G.add_edge(4, 5)
-show_graph_in_cytoscape(G, file_name='test_graph')
+graph = nx.Graph()
+graph.add_edge(1, 2)
+graph.add_edge(1, 3)
+graph.add_edge(1, 5)
+graph.add_edge(2, 3)
+graph.add_edge(3, 4)
+graph.add_edge(4, 5)
+
+show_network_in_cytoscape(graph, file_name='test_graph')
+show_network_in_cytoscape(graph, file_name='test_graph')
