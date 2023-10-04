@@ -4,7 +4,15 @@ from datetime import datetime
 import os
 import multiprocessing
 import requests.exceptions
+import json
 
+
+def relabel_nodes_to_str(nx_graph):
+    mapping = {}
+    for node in nx_graph.nodes:
+        mapping[node] = str(node)
+
+    return nx.relabel_nodes(nx_graph, mapping)
 
 
 def save_graph_as_cytoscape_file(nx_graph, file_format='gml', file_name=None):
@@ -13,9 +21,16 @@ def save_graph_as_cytoscape_file(nx_graph, file_format='gml', file_name=None):
         file_name = f'nx_graph_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
 
     # create file in default(gml) or selected format
+    full_file_name = f'{file_name}.{file_format}'
     match file_format:
         case 'gml':
-            nx.write_gml(nx_graph, f'{file_name}.{file_format}')
+            nx.write_gml(nx_graph, full_file_name)
+        case 'cyjs':
+            str_nodes_nx_graph = relabel_nodes_to_str(nx_graph)
+            cyjs_graph_data = nx.cytoscape_data(str_nodes_nx_graph)
+            cyjs_file = open(full_file_name, 'w')
+            json.dump(cyjs_graph_data, cyjs_file)
+
 
     # return full file name for import file in cytoscape as network
     return f'{file_name}.{file_format}'
@@ -70,5 +85,5 @@ graph.add_edge(2, 3)
 graph.add_edge(3, 4)
 graph.add_edge(4, 5)
 
-show_network_in_cytoscape(graph, file_name='test_graph')
+show_network_in_cytoscape(graph, file_format='cyjs', file_name='test_graph')
 show_network_in_cytoscape(graph, file_name='test_graph')
