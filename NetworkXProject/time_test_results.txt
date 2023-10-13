@@ -1,0 +1,7 @@
+open nx_graph with not running cytoscape: 19.76 s
+open session with not running cytoscape: 19.80 s
+
+open nx_graph with running cytoscape: 4.19 s
+open session with running cytoscape: 0.72 s
+
+save nx_graph as session: 0.09 s
