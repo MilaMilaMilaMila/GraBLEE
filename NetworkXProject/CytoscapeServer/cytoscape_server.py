@@ -76,13 +76,15 @@ def server_program():
     conn, address = server_socket.accept()  # accept new connection
     print("Connection from: " + str(address))
 
-    filename = get_gml_file(conn)
-    session_file_name = create_cytoscape_session(filename)
-    sent_cytoscape_session_file_to_client(conn, session_file_name)
+    while True:
+        filename = get_gml_file(conn)
+        session_file_name = create_cytoscape_session(filename)
+        sent_cytoscape_session_file_to_client(conn, session_file_name)
 
-    conn.close()  # close the connection
-    os.remove(filename)
-    os.remove(session_file_name)
+        os.remove(filename)
+        os.remove(session_file_name)
+
+    # conn.close()  # close the connection
 
 
 if __name__ == '__main__':
