@@ -66,7 +66,8 @@ def server_program():
     config = configparser.ConfigParser()
     config.read('config_server.ini')
 
-    host = config['DEFAULT']['Host']
+    # host = config['DEFAULT']['Host']
+    host = socket.gethostname()
     port = int(config['DEFAULT']['Port']) # initiate port no above 1024
     listeners_amount = int(config['DEFAULT']['Listeners_amount'])
 
