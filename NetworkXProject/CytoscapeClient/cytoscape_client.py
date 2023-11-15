@@ -29,7 +29,11 @@ def get_cytoscape_session(client_socket, cys_file_name=None):
     file.close()
 
 
-def client_program():
+def send_style_file(style_file_path=None):
+
+
+
+def open_as_cs_session(session_name=None, style_file_path=None):
     config = configparser.ConfigParser()
     config.read('config_client.ini')
 
@@ -40,10 +44,6 @@ def client_program():
     client_socket.connect((host, port))
 
     send_nx_graph_to_cytoscape_server(client_socket)
-    get_cytoscape_session(client_socket)
+    get_cytoscape_session(client_socket, cys_file_name=session_name)
 
     client_socket.close()
-
-
-if __name__ == '__main__':
-    client_program()
