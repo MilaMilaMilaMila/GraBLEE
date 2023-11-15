@@ -2,6 +2,8 @@ import socket
 import configparser
 from datetime import datetime
 import os
+import json
+from dict2xml import dict2xml
 
 
 def send_nx_graph_to_cytoscape_server(client_socket):
@@ -29,8 +31,19 @@ def get_cytoscape_session(client_socket, cys_file_name=None):
     file.close()
 
 
-def send_style_file(style_file_path=None):
+def send_style_file(client_socket, style_file_path=None):
+    file_format = style_file_path.split('.')[-1]
+    style_file = open(style_file_path)
 
+    style_data = ""
+    if file_format == "json":
+        data = json.load(style_file)
+        style_data = dict2xml(data)
+    elif file_format == "xml":
+        style_data = style_file.read()
+
+    bytes_style = bytes(style_data, 'utf-8')
+    client_socket.send(bytes_style)
 
 
 def open_as_cs_session(session_name=None, style_file_path=None):
@@ -47,3 +60,7 @@ def open_as_cs_session(session_name=None, style_file_path=None):
     get_cytoscape_session(client_socket, cys_file_name=session_name)
 
     client_socket.close()
+
+
+if __name__ == '__main__':
+    open_as_cs_session()
