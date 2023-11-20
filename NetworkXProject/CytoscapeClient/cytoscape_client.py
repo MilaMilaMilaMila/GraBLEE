@@ -16,6 +16,8 @@ def send_nx_graph_to_cytoscape_server(client_socket):
     client_socket.send(data)
     data = client_socket.recv(1024).decode()
     print(data)
+    data = client_socket.recv(1024).decode()
+    print(data)
     # os.remove(filename)
 
 

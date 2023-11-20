@@ -32,6 +32,7 @@ def get_gml_file(conn, data_package_bytes_limit=1024):
         return
     file_name = save_client_cytoscape_file(data)
     conn.send(file_name.encode())  # send data to the client
+    conn.send(file_name.encode())  # send data to the client
     return file_name
 
 
