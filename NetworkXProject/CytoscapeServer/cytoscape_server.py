@@ -62,7 +62,7 @@ def sent_cytoscape_session_file_to_client(conn, session_file_name):
     conn.send(data)
     answ = conn.recv(1024).decode()
     print(f'client status: {answ}')
-    conn.send(b'get client status')
+    conn.send('get client status'.encode())
 
 
 def server_program():
