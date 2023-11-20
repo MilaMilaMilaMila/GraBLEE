@@ -66,26 +66,25 @@ def server_program():
     config = configparser.ConfigParser()
     config.read('config_server.ini')
 
-    # host = config['DEFAULT']['Host']
-    host = socket.gethostname()
-    port = int(config['DEFAULT']['Port']) # initiate port no above 1024
-    listeners_amount = int(config['DEFAULT']['Listeners_amount'])
+    host = config['REMOTE']['Host']
+    port = int(config['REMOTE']['Port']) # initiate port no above 1024
+    listeners_amount = int(config['REMOTE']['Listeners_amount'])
 
     server_socket = socket.socket()
     server_socket.bind((host, port))
     server_socket.listen(listeners_amount)
-    conn, address = server_socket.accept()  # accept new connection
-    print("Connection from: " + str(address))
 
     while True:
+        conn, address = server_socket.accept()  # accept new connection
+        print("Connection from: " + str(address))
         filename = get_gml_file(conn)
+        print(filename)
         session_file_name = create_cytoscape_session(filename)
         sent_cytoscape_session_file_to_client(conn, session_file_name)
 
         os.remove(filename)
         os.remove(session_file_name)
-
-    # conn.close()  # close the connection
+        conn.close()  # close the connection
 
 
 if __name__ == '__main__':

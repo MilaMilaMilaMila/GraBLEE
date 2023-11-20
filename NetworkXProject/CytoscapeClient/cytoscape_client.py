@@ -33,8 +33,8 @@ def client_program():
     config = configparser.ConfigParser()
     config.read('config_client.ini')
 
-    host = config['DEFAULT']['Host']
-    port = int(config['DEFAULT']['Port'])
+    host = config['REMOTE']['Host']
+    port = int(config['REMOTE']['Port'])
 
     client_socket = socket.socket()
     client_socket.connect((host, port))
