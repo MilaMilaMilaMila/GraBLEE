@@ -27,6 +27,11 @@ def get_cytoscape_session(client_socket, cys_file_name=None):
     file = open(cys_file_name, "wb")
     file.write(cys_file_data)
     file.close()
+    client_socket.send(b'get session')
+    answ = client_socket.recv(1024).decode()
+    print(f'server status: {answ}')
+
+
 
 
 def client_program():
