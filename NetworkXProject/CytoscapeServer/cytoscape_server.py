@@ -58,8 +58,13 @@ def sent_cytoscape_session_file_to_client(conn, session_file_name):
     data = file.read()
     file.close()
     len_data = len(data)
+    print(f'session size: {len_data}')
     conn.send(len_data.to_bytes(length=4, byteorder='big'))
-    conn.send(data)
+    file_part_len = 1024
+    for i in range(0, len_data, file_part_len):
+        conn.send(data[i:min(i + file_part_len, len_data - 1)])
+
+
     # answ = conn.recv(1024).decode()
     # print(f'client status: {answ}')
     # conn.send('get client status'.encode())

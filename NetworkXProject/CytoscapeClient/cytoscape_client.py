@@ -23,16 +23,26 @@ def send_nx_graph_to_cytoscape_server(client_socket):
 
 
 def get_cytoscape_session(client_socket, cys_file_name=None):
-    cys_file_len = int.from_bytes(client_socket.recv(1024), byteorder='big')
-    cys_file_data = client_socket.recv(cys_file_len)
     if cys_file_name is None:
         cys_file_name = f'client_nx_graph_session_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.cys'
     file = open(cys_file_name, "wb")
-    file.write(cys_file_data)
+
+    cys_file_len = int.from_bytes(client_socket.recv(1024), byteorder='big')
+    print(cys_file_len)
+    file_part_len = 1024
+    recved_data_len = 0
+    while True:
+        cys_file_data = client_socket.recv(file_part_len)
+        if not cys_file_data:
+            break
+        file.write(cys_file_data)
+        recved_data_len += len(cys_file_data)
+    print(f'get bytes: {recved_data_len}')
+
     file.close()
-    client_socket.send('get session'.encode())
-    answ = client_socket.recv(1024).decode()
-    print(f'server status: {answ}')
+    # client_socket.send('get session'.encode())
+    # answ = client_socket.recv(1024).decode()
+    # print(f'server status: {answ}')
 
 
 def client_program():
