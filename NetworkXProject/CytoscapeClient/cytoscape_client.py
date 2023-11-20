@@ -11,13 +11,14 @@ def send_nx_graph_to_cytoscape_server(client_socket):
     file.close()
     len_data_in_bytes = len(data).to_bytes(length=8, byteorder='big')
     client_socket.send(len_data_in_bytes)
-    get_file_size = client_socket.recv(1024).decode()
-    print(get_file_size)
+    # get_file_size = client_socket.recv(1024).decode()
+    # print(get_file_size)
     client_socket.send(data)
-    data = client_socket.recv(1024).decode()
-    print(data)
-    data = client_socket.recv(1024).decode()
-    print(data)
+    # data = client_socket.recv(1024).decode()
+    # print(data)
+    # data = client_socket.recv(1024).decode()
+    # print(data)
+
     # os.remove(filename)
 
 
@@ -34,8 +35,6 @@ def get_cytoscape_session(client_socket, cys_file_name=None):
     print(f'server status: {answ}')
 
 
-
-
 def client_program():
     config = configparser.ConfigParser()
     config.read('config_client.ini')
@@ -43,7 +42,7 @@ def client_program():
     host = config['REMOTE']['Host']
     port = int(config['REMOTE']['Port'])
 
-    client_socket = socket.socket()
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
 
     send_nx_graph_to_cytoscape_server(client_socket)

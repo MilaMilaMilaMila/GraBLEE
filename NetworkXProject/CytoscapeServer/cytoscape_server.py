@@ -21,18 +21,17 @@ def save_client_cytoscape_file(data, file_name=None, file_format='gml'):
 
 
 def get_gml_file(conn, data_package_bytes_limit=1024):
-
     data_len = conn.recv(data_package_bytes_limit)
     data_len = int.from_bytes(data_len, byteorder='big')
     print(data_len)
-    conn.send(f'get file len {data_len}'.encode())
+    # conn.send(f'get file len {data_len}'.encode())
     data = conn.recv(data_len)
     if not data:
         # if data is not received break
         return
     file_name = save_client_cytoscape_file(data)
-    conn.send(file_name.encode())  # send data to the client
-    conn.send(file_name.encode())  # send data to the client
+    # conn.send(file_name.encode())  # send data to the client
+    # conn.send(file_name.encode())  # send data to the client
     return file_name
 
 
@@ -59,11 +58,11 @@ def sent_cytoscape_session_file_to_client(conn, session_file_name):
     data = file.read()
     file.close()
     len_data = len(data)
-    conn.send(len_data.to_bytes(length=8, byteorder='big'))
+    conn.send(len_data.to_bytes(length=4, byteorder='big'))
     conn.send(data)
-    answ = conn.recv(1024).decode()
-    print(f'client status: {answ}')
-    conn.send('get client status'.encode())
+    # answ = conn.recv(1024).decode()
+    # print(f'client status: {answ}')
+    # conn.send('get client status'.encode())
 
 
 def server_program():
@@ -74,7 +73,7 @@ def server_program():
     port = int(config['REMOTE']['Port']) # initiate port no above 1024
     listeners_amount = int(config['REMOTE']['Listeners_amount'])
 
-    server_socket = socket.socket()
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(listeners_amount)
 
