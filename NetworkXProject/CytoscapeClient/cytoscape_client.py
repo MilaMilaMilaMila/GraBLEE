@@ -3,6 +3,7 @@ import configparser
 from datetime import datetime
 import networkx as nx
 import os
+import matplotlib.pyplot as plt
 
 
 def send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name=None):
@@ -10,6 +11,7 @@ def send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name=None)
         cs_session_name = f'client_nx_graph_session_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
     gml_graph_filename = cs_session_name + ".gml"
     nx.write_gml(self, gml_graph_filename)
+    # nx.write_graphml_xml(self, gml_graph_filename)
     file = open(gml_graph_filename, "rb")
     data = file.read()
     file.close()
@@ -23,7 +25,7 @@ def send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name=None)
     # data = client_socket.recv(1024).decode()
     # print(data)
 
-    os.remove(gml_graph_filename)
+    # os.remove(gml_graph_filename)
 
 
 def get_cytoscape_session(client_socket, cs_session_name=None):
@@ -52,7 +54,29 @@ def get_cytoscape_session(client_socket, cs_session_name=None):
     # print(f'server status: {answ}')
 
 
-def client_program(self, cs_session_name=None):
+def apply_layout(graph, algo_name):
+    pos = {}
+    match algo_name:
+        case 'spring':
+            pos = nx.spring_layout(graph)
+        case 'shell':
+            pos = nx.shell_layout(graph)
+        case 'circular':
+            pos = nx.circular_layout(graph)
+            print('here')
+        case 'random':
+            pos = nx.random_layout(graph)
+
+    for i in pos:
+        pos[i] = (round(pos[i][0], 5), round(pos[i][1], 5))
+
+    nx.set_node_attributes(graph, pos, 'pos')
+    nx.draw(graph, pos)
+    plt.show()
+
+
+def client_program(self, cs_session_name=None, layout_algorith='random'):
+
     config = configparser.ConfigParser()
     config.read('CytoscapeClient/config_client.ini')
     host = config['DEFAULT']['Host']
@@ -61,6 +85,7 @@ def client_program(self, cs_session_name=None):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
 
+    apply_layout(self, layout_algorith)
     send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name)
     get_cytoscape_session(client_socket, cs_session_name)
 
