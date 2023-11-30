@@ -111,8 +111,8 @@ def client_program(self, cs_session_name=None, layout_algorith='random'):
 
     config = configparser.ConfigParser()
     config.read('CytoscapeClient/config_client.ini')
-    host = config['DEFAULT']['Host']
-    port = int(config['DEFAULT']['Port'])
+    host = config['REMOTE']['Host']
+    port = int(config['REMOTE']['Port'])
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
