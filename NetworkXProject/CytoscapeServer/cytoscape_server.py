@@ -24,14 +24,12 @@ def get_gml_file(conn, data_package_bytes_limit=1024):
     data_len = conn.recv(data_package_bytes_limit)
     data_len = int.from_bytes(data_len, byteorder='big')
     print(data_len)
-    # conn.send(f'get file len {data_len}'.encode())
     data = conn.recv(data_len)
     if not data:
         # if data is not received break
         return
     file_name = save_client_cytoscape_file(data)
-    # conn.send(file_name.encode())  # send data to the client
-    # conn.send(file_name.encode())  # send data to the client
+
     return file_name
 
 
@@ -64,10 +62,6 @@ def sent_cytoscape_session_file_to_client(conn, session_file_name):
     for i in range(0, len_data, file_part_len):
         conn.send(data[i:min(i + file_part_len, len_data - 1)])
 
-
-    # answ = conn.recv(1024).decode()
-    # print(f'client status: {answ}')
-    # conn.send('get client status'.encode())
 
 
 def server_program():

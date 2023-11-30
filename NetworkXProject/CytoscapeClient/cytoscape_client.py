@@ -61,14 +61,7 @@ def send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name=None,
     file.close()
     len_data_in_bytes = len(data).to_bytes(length=8, byteorder='big')
     client_socket.send(len_data_in_bytes)
-    # get_file_size = client_socket.recv(1024).decode()
-    # print(get_file_size)
     client_socket.send(data)
-    # data = client_socket.recv(1024).decode()
-    # print(data)
-    # data = client_socket.recv(1024).decode()
-    # print(data)
-
     os.remove(graph_filename)
 
 
@@ -93,9 +86,6 @@ def get_cytoscape_session(client_socket, cs_session_name=None):
     print(f'get bytes: {received_data_len}')
 
     file.close()
-    # client_socket.send('get session'.encode())
-    # answ = client_socket.recv(1024).decode()
-    # print(f'server status: {answ}')
 
 
 def apply_layout(graph, algo_name):
