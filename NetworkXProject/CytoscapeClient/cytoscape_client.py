@@ -4,15 +4,59 @@ from datetime import datetime
 import networkx as nx
 import os
 import matplotlib.pyplot as plt
+import json
 
 
-def send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name=None):
-    if cs_session_name is None:
-        cs_session_name = f'client_nx_graph_session_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
-    gml_graph_filename = cs_session_name + ".gml"
-    nx.write_gml(self, gml_graph_filename)
-    # nx.write_graphml_xml(self, gml_graph_filename)
-    file = open(gml_graph_filename, "rb")
+def set_position_in_cyjs(filename, pos):
+    file = open(filename)
+    data = json.load(file)
+    file.close()
+    os.remove(filename)
+
+    for i in data["elements"]["nodes"]:
+        i['position'] = {"x": pos[int(i['data']['name'])][0] * 100, "y": pos[int(i['data']['name'])][1] * 100}
+        # print(i['position'])
+
+    file = open(f'{filename}.cyjs', 'w')
+    json.dump(data, file)
+    file.close()
+
+
+def relabel_nodes_to_str(nx_graph):
+    mapping = {}
+    for node in nx_graph.nodes:
+        mapping[node] = str(node)
+
+    return nx.relabel_nodes(nx_graph, mapping)
+
+
+def save_graph_as_cytoscape_file(nx_graph, file_format='cyjs', file_name=None, layout_algorithm='random'):
+    pos = apply_layout(nx_graph, layout_algorithm)
+
+    # if file name wasn't specified, file name created with current datetime info nx_graph_{date and time}
+    if file_name is None:
+        file_name = f'client_nx_graph_session_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
+
+    # create file in default(gml) or selected format
+    full_file_name = f'{file_name}.{file_format}'
+    match file_format:
+        case 'gml':
+            nx.write_gml(nx_graph, full_file_name)
+        case 'cyjs':
+            str_nodes_nx_graph = relabel_nodes_to_str(nx_graph)
+            cyjs_graph_data = nx.cytoscape_data(str_nodes_nx_graph)
+            cyjs_file = open(file_name, 'w')
+            json.dump(cyjs_graph_data, cyjs_file)
+            cyjs_file.close()
+            set_position_in_cyjs(file_name, pos)
+
+    # return full file name for import file in cytoscape as network
+    return full_file_name
+
+
+def send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name=None, layout_algorithm='random'):
+    graph_filename = save_graph_as_cytoscape_file(self, file_format='cyjs', file_name=cs_session_name, layout_algorithm=layout_algorithm)
+    file = open(graph_filename, "rb")
     data = file.read()
     file.close()
     len_data_in_bytes = len(data).to_bytes(length=8, byteorder='big')
@@ -25,7 +69,7 @@ def send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name=None)
     # data = client_socket.recv(1024).decode()
     # print(data)
 
-    # os.remove(gml_graph_filename)
+    os.remove(graph_filename)
 
 
 def get_cytoscape_session(client_socket, cs_session_name=None):
@@ -70,9 +114,7 @@ def apply_layout(graph, algo_name):
     for i in pos:
         pos[i] = (round(pos[i][0], 5), round(pos[i][1], 5))
 
-    nx.set_node_attributes(graph, pos, 'pos')
-    nx.draw(graph, pos)
-    plt.show()
+    return pos
 
 
 def client_program(self, cs_session_name=None, layout_algorith='random'):
@@ -85,8 +127,7 @@ def client_program(self, cs_session_name=None, layout_algorith='random'):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
 
-    apply_layout(self, layout_algorith)
-    send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name)
+    send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name, layout_algorith)
     get_cytoscape_session(client_socket, cs_session_name)
 
     client_socket.close()

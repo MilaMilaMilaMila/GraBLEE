@@ -5,7 +5,7 @@ import py4cytoscape as p4c
 import os
 
 
-def save_client_cytoscape_file(data, file_name=None, file_format='gml'):
+def save_client_cytoscape_file(data, file_name=None, file_format='cyjs'):
     # if file name wasn't specified, file name created with current datetime info nx_graph_{date and time}
     if file_name is None:
         file_name = f'nx_graph_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
