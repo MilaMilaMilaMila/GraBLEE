@@ -3,6 +3,8 @@ import configparser
 from datetime import datetime
 import py4cytoscape as p4c
 import os
+import threading
+import time
 
 
 def save_client_cytoscape_file(data, file_name=None, file_format='cyjs'):
@@ -20,7 +22,7 @@ def save_client_cytoscape_file(data, file_name=None, file_format='cyjs'):
     return full_file_name
 
 
-def get_gml_file(conn, data_package_bytes_limit=1024):
+def get_graph_file(conn, data_package_bytes_limit=1024):
     data_len = conn.recv(data_package_bytes_limit)
     data_len = int.from_bytes(data_len, byteorder='big')
     print(data_len)
@@ -63,23 +65,36 @@ def sent_cytoscape_session_file_to_client(conn, session_file_name):
         conn.send(data[i:min(i + file_part_len, len_data - 1)])
 
 
+def ping_cytoscape():
+    try:
+        p4c.cytoscape_ping()
+
+        print('Успешный пинг к Cytoscape')
+        time.sleep(60)
+
+    except Exception as e:
+        print(f'Ошибка пинга: {e}')
+
 
 def server_program():
     config = configparser.ConfigParser()
     config.read('config_server.ini')
 
-    host = config['REMOTE']['Host']
-    port = int(config['REMOTE']['Port']) # initiate port no above 1024
-    listeners_amount = int(config['REMOTE']['Listeners_amount'])
+    host = config['DEFAULT']['Host']
+    port = int(config['DEFAULT']['Port']) # initiate port no above 1024
+    listeners_amount = int(config['DEFAULT']['Listeners_amount'])
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(listeners_amount)
 
     while True:
+        ping_thread = threading.Thread(target=ping_cytoscape)
+        ping_thread.start()
+
         conn, address = server_socket.accept()  # accept new connection
         print("Connection from: " + str(address))
-        filename = get_gml_file(conn)
+        filename = get_graph_file(conn)
         print(filename)
         session_file_name = create_cytoscape_session(filename)
         sent_cytoscape_session_file_to_client(conn, session_file_name)
