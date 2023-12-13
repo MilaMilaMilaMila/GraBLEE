@@ -1,6 +1,8 @@
 import enum
 import xml.etree.ElementTree as ET
 import datetime
+import uuid
+from datetime import datetime
 
 
 class LineType(enum.Enum):
@@ -290,6 +292,7 @@ class VisualStyle:
     __edge: Edge
 
     def __init__(self, network: Network, node: Node, edge: Edge):
+        self.__name = str(uuid.uuid4())
         self.__network = network
         self.__node = node
         self.__edge = edge
@@ -319,7 +322,7 @@ class Style:
     def __init__(self):
         self.__style_xml = ET.Element('vizmap')
         self.__style_xml.set('id', 'VizMap-' +
-                             str(datetime.datetime.now().date())
+                             str(datetime.now().date())
                              )
         self.__style_xml.set('documentVersion', self.__DOCUMENT_VERSION)
 
@@ -352,17 +355,22 @@ class Style:
                         for name, value in var_data.items():
                             conf_part.set(name, str(value))
 
+        data = ET.tostring(self.__style_xml, encoding='utf-8')
+        file = open(f'{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.xml', 'wb')
+        file.write(data)
+        file.close()
+
         return self.__style_xml
 
 
 if __name__ == "__main__":
-    vs_1 = VisualStyle(Network(), Node(), Edge()).changeName('v1')
-    vs_2 = VisualStyle(Network(), Node(), Edge()).changeName('v2')
-    vs_3 = VisualStyle(Network(), Node(), Edge()).changeName('v3')
+    vs_1 = VisualStyle(Network(), Node(), Edge())
+    # vs_2 = VisualStyle(Network(), Node(), Edge()).changeName('v2')
+    # vs_3 = VisualStyle(Network(), Node(), Edge()).changeName('v3')
 
     style = Style() \
         .addVisualStyle(vs_1) \
-        .addVisualStyle(vs_2) \
-        .addVisualStyle(vs_3)
+        # .addVisualStyle(vs_2) \
+        # .addVisualStyle(vs_3)
 
-    ET.dump(style.generate_xml())
+    xml = style.generate_xml()
