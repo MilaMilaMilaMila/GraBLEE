@@ -3,7 +3,6 @@ import configparser
 from datetime import datetime
 import networkx as nx
 import os
-import matplotlib.pyplot as plt
 import json
 
 
@@ -54,18 +53,40 @@ def save_graph_as_cytoscape_file(nx_graph, file_format='cyjs', file_name=None, l
     return full_file_name
 
 
-def send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name=None, layout_algorithm='random'):
+def send_nx_graph_to_cytoscape_server(self, conn, cs_session_name=None, layout_algorithm='random', package_size=1024):
+    print('\nCLIENT: GRAPH DELIVER START')
     graph_filename = save_graph_as_cytoscape_file(self, file_format='cyjs', file_name=cs_session_name, layout_algorithm=layout_algorithm)
     file = open(graph_filename, "rb")
+    # TODO читать тоже лучше не полностью а по пакетам
     data = file.read()
     file.close()
-    len_data_in_bytes = len(data).to_bytes(length=8, byteorder='big')
-    client_socket.send(len_data_in_bytes)
-    client_socket.send(data)
+    data_len = len(data)
+    print(f'CLIENT: sending file size: {data_len}')
+    len_data_in_bytes = data_len.to_bytes(length=8, byteorder='big')
+    print(f'CLIENT: sending file size in bytes: {len_data_in_bytes}')
+    conn.send(len_data_in_bytes)
+    response = conn.recv(package_size).decode()
+    print(response)
+
+    for i in range(0, data_len, package_size):
+        conn.send(data[i: min(i + package_size, data_len)])
+        response = conn.recv(package_size).decode()
+        print(response)
+        if response != 'ok':
+            print('CLIENT: getting file package error')
+            print('CLIENT: PROGRAM WAS TERMINATED')
+            exit()
+
+    conn.send(f'CLIENT MESSAGE: all file data was sent'.encode())
+    response = conn.recv(package_size).decode()
+    print(response)
+
     os.remove(graph_filename)
+    print('CLIENT: delivery successfully')
+    print('CLIENT: GRAPH DELIVER END\n')
 
 
-def get_cytoscape_session(client_socket, cs_session_name=None):
+def get_cytoscape_session(conn, cs_session_name=None, package_size=1024):
     if cs_session_name is None:
         cs_session_name = f'client_nx_graph_session_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.cys'
     else:
@@ -73,17 +94,40 @@ def get_cytoscape_session(client_socket, cs_session_name=None):
 
     file = open(cs_session_name, "wb")
 
-    cys_file_len = int.from_bytes(client_socket.recv(1024), byteorder='big')
-    print(cys_file_len)
-    file_part_len = 1024
+    print('\nCLIENT: SESSION RECEIVE START')
+    data_len = conn.recv(package_size)
+    print(f'CLIENT: sending file size in bytes: {data_len}')
+    data_len = int.from_bytes(data_len, byteorder='big')
+    print(f'CLIENT: sending file size: {data_len}')
+    response = f'CLIENT MESSAGE: received file len: {data_len}'
+    conn.send(response.encode())
+
     received_data_len = 0
     while True:
-        cys_file_data = client_socket.recv(file_part_len)
-        if not cys_file_data:
+        try:
+            part_data = conn.recv(package_size)
+        except BaseException as e:
+            print(f'SERVER: GETTING GRAPH: error: {e}')
+            exit()
+
+        print(f'in process get {len(part_data)}')
+        conn.send('ok'.encode())
+
+        if not part_data:
             break
-        file.write(cys_file_data)
-        received_data_len += len(cys_file_data)
-    print(f'get bytes: {received_data_len}')
+
+        file.write(part_data)
+        received_data_len += len(part_data)
+
+        if received_data_len == data_len:
+            break
+
+    print(f'CLIENT: get bytes: {received_data_len}')
+    response = conn.recv(package_size).decode()
+    print(response)
+    response = f'CLIENT MESSAGE: get bytes: {received_data_len}'.encode()
+    conn.send(response)
+    print('CLIENT: SESSION RECEIVE END\n')
 
     file.close()
 
@@ -107,15 +151,61 @@ def apply_layout(graph, algo_name):
     return pos
 
 
-def client_program(self, cs_session_name=None, layout_algorith='random'):
+def send_styles(conn, styles_filename, package_size=1024):
+
+    if styles_filename:
+        conn.send('TRUE'.encode())
+        response = conn.recv(package_size).decode()
+        print(response)
+
+        print('\nCLIENT: STYLES DELIVER START')
+        file = open(styles_filename, "rb")
+        # TODO читать тоже лучше не полностью а по пакетам
+        data = file.read()
+        file.close()
+        data_len = len(data)
+        print(f'CLIENT: sending file size: {data_len}')
+        len_data_in_bytes = data_len.to_bytes(length=8, byteorder='big')
+        print(f'CLIENT: sending file size in bytes: {len_data_in_bytes}')
+        conn.send(len_data_in_bytes)
+        response = conn.recv(package_size).decode()
+        print(response)
+
+        for i in range(0, data_len, package_size):
+            conn.send(data[i: min(i + package_size, data_len)])
+            response = conn.recv(package_size).decode()
+            print(response)
+            if response != 'ok':
+                print('CLIENT: getting file package error')
+                print('CLIENT: PROGRAM WAS TERMINATED')
+                exit()
+
+        conn.send(f'CLIENT MESSAGE: all file data was sent'.encode())
+        response = conn.recv(package_size).decode()
+        print(response)
+
+        # os.remove(styles_filename)
+        print('CLIENT: delivery successfully')
+        print('CLIENT: STYLES DELIVER END\n')
+        return
+
+    conn.send('FALSE'.encode())
+    response = conn.recv(package_size).decode()
+    print(response)
+    return
+
+
+def client_program(self, cs_session_name=None, layout_algorith='random', styles_filename=None):
 
     config = configparser.ConfigParser()
     config.read('CytoscapeClient/config_client.ini')
-    host = config['DEFAULT']['Host']
-    port = int(config['DEFAULT']['Port'])
+    host = config['MAC']['Host']
+    port = int(config['MAC']['Port'])
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
+
+    send_styles(client_socket, styles_filename)
 
     send_nx_graph_to_cytoscape_server(self, client_socket, cs_session_name, layout_algorith)
     get_cytoscape_session(client_socket, cs_session_name)
