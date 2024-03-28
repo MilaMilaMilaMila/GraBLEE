@@ -1,10 +1,8 @@
 from datetime import datetime
-import py4cytoscape as p4c
-import os
-import xmltodict as xd
 from logging import Logger
-from server.business.models.datadto import DataDTO
 from socket import socket
+
+from ..models.datadto import DataDTO
 from server.data_access.file_system import FileSystemRepo
 
 

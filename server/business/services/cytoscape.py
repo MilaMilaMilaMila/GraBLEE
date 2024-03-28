@@ -1,8 +1,10 @@
+from logging import Logger
+
 import py4cytoscape as p4c
 import xmltodict as xd
-from server.business.models.session import Session
+
+from ..models.session import Session
 from server.data_access.file_system import FileSystemRepo
-from logging import Logger
 
 
 class Cytoscape:
