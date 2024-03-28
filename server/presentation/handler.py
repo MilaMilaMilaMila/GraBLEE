@@ -1,10 +1,10 @@
 import os
 
 
-from server.business.services.transfer import Transfer
-from server.business.services.cytoscape import Cytoscape
-from server.business.models.datadto import DataDTO
-from server.business.models.session import Session
+from business.services.transfer import Transfer
+from business.services.cytoscape import Cytoscape
+from business.models.datadto import DataDTO
+from business.models.session import Session
 from socket import socket
 from logging import Logger
 

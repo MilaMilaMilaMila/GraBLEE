@@ -4,7 +4,7 @@ import py4cytoscape as p4c
 import xmltodict as xd
 
 from ..models.session import Session
-from server.data_access.file_system import FileSystemRepo
+from data_access.file_system import FileSystemRepo
 
 
 class Cytoscape:

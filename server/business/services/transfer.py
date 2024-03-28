@@ -3,7 +3,7 @@ from logging import Logger
 from socket import socket
 
 from ..models.datadto import DataDTO
-from server.data_access.file_system import FileSystemRepo
+from data_access.file_system import FileSystemRepo
 
 
 class Transfer:
