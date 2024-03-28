@@ -32,7 +32,7 @@ for section in config_values:
     for param in params:
         values.set(section, param, str(params[param]))
 
-with open('config/values.ini', 'w') as configfile:
+with open('config.ini', 'w') as configfile:
     values.write(configfile)
 
 config = configparser.ConfigParser()
@@ -50,5 +50,5 @@ config.add_section(section)
 for param in configuration:
     config.set(section, param, configuration[param])
 
-with open('config/config_.ini', 'w') as configfile:
+with open('config_.ini', 'w') as configfile:
     config.write(configfile)
