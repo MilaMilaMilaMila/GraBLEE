@@ -72,10 +72,3 @@ class Handler:
         self.send_cytoscape_session(cys)
 
         self.clean_work_dir(graph_dto, styles_dto, cys)
-
-
-
-
-
-
-

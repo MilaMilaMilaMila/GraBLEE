@@ -4,5 +4,3 @@ class DataDTO:
         self.file_name = file_name
         self.file_format = file_format
         self.file_path = file_path
-
-
