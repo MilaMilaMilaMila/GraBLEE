@@ -55,8 +55,8 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
     host = config[connection_params]['host']
     port = int(config[connection_params]['port'])
 
-    logger.info(f'defined host {host}')
-    logger.info(f'defined port {port}')
+    logger.info(f'define host {host}')
+    logger.info(f'define port {port}')
 
     socket = sct.socket(sct.AF_INET, sct.SOCK_STREAM)
     socket.connect((host, port))
@@ -68,7 +68,7 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
     # handler
     handler = Handler(transfer, nx, logger, socket)
 
-    logger.info('app run')
+    logger.info('run app')
 
     handler.handle(g=self,
                    cs_session_name=cs_session_name,

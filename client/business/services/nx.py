@@ -11,18 +11,18 @@ class Networkx:
         self.logger = l
 
     def relabel_nodes_to_str(self, g: nx.Graph):
-        self.logger.info('started relabel graph nodes to str type')
+        self.logger.info('start relabeling graph nodes to str type')
 
         mapping = {}
         for node in g.nodes:
             mapping[node] = str(node)
 
-        self.logger.info('finished relabel graph nodes to str type')
+        self.logger.info('finish relabeling graph nodes to str type')
 
         return nx.relabel_nodes(g, mapping)
 
     def get_layout_pos(self, g: nx.Graph, layout_algo: str):
-        self.logger.info('started get layout nodes positions')
+        self.logger.info('start getting layout nodes positions')
 
         pos = {}
         match layout_algo:
@@ -38,12 +38,12 @@ class Networkx:
         for i in pos:
             pos[i] = (round(pos[i][0], 5), round(pos[i][1], 5))
 
-        self.logger.info('finished get layout nodes positions')
+        self.logger.info('finish getting layout nodes positions')
 
         return pos
 
     def set_position_in_cyjs(self, filename, pos):
-        self.logger.info('started set layout nodes positions to cyjs file')
+        self.logger.info('start setting layout nodes positions to cyjs file')
 
         file = open(filename)
         data = json.load(file)
@@ -57,10 +57,10 @@ class Networkx:
         json.dump(data, file)
         file.close()
 
-        self.logger.info('finished set layout nodes positions to cyjs file')
+        self.logger.info('finish setting layout nodes positions to cyjs file')
 
     def complete_graph_as_cyjs(self, g: nx.Graph, file_format='cyjs', layout_algo='random') -> str:
-        self.logger.info('started complete graph as cyjs')
+        self.logger.info('start completing graph as cyjs')
 
         pos = self.get_layout_pos(g, layout_algo)
 
@@ -72,7 +72,7 @@ class Networkx:
         FileSystemRepo.write_cyjs(file_name, cyjs_graph_data)
         self.set_position_in_cyjs(file_name, pos)
 
-        self.logger.info('finished complete graph as cyjs')
-        self.logger.info(f'graph data written in {full_file_name}')
+        self.logger.info('finish completing graph as cyjs')
+        self.logger.info(f'write graph data in {full_file_name}')
 
         return full_file_name

@@ -13,7 +13,7 @@ class Transfer:
         self.package_size = 1024
 
     def get_data_len(self, conn: socket) -> int:
-        self.logger.info('started get data len')
+        self.logger.info('start getting data len')
 
         data_len = conn.recv(self.package_size)
         data_len = int.from_bytes(data_len, byteorder='big')
@@ -21,12 +21,12 @@ class Transfer:
         self.logger.info(msg)
         conn.send(msg.encode())
 
-        self.logger.info('finished get data len')
+        self.logger.info('finish getting data len')
 
         return data_len
 
     def send_data_len(self, conn: socket, data_len: int):
-        self.logger.info('started send data len')
+        self.logger.info('start sending data len')
         self.logger.info(f'data len = {data_len}')
 
         len_data_bin = data_len.to_bytes(length=8, byteorder='big')
@@ -34,12 +34,12 @@ class Transfer:
         response = conn.recv(self.package_size).decode()
         self.logger.info(f'server response: {response}')
 
-        self.logger.info('finished send data len')
+        self.logger.info('finish sending data len')
 
     def get_data(self, conn: socket, file_path: str):
         data_len = self.get_data_len(conn)
 
-        self.logger.info('started get data')
+        self.logger.info('start getting data')
 
         received_data_len = 0
         while received_data_len < data_len:
@@ -52,7 +52,7 @@ class Transfer:
                 exit()
 
             if not batch:
-                self.logger.info('finished get data')
+                self.logger.info('finish getting data')
                 break
 
             FileSystemRepo.write_binary(file_path, batch)
@@ -68,7 +68,7 @@ class Transfer:
         data_len = len(data)
         self.send_data_len(conn, data_len)
 
-        self.logger.info('started send data')
+        self.logger.info('start sending data')
 
         for i in range(0, data_len, self.package_size):
             conn.send(data[i:min(i + self.package_size, data_len)])
@@ -82,5 +82,4 @@ class Transfer:
         response = conn.recv(self.package_size).decode()
         self.logger.info(f'server response: {response}')
 
-        self.logger.info('finished send data')
-
+        self.logger.info('finish sending data')

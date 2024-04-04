@@ -19,18 +19,18 @@ class Handler:
         return self.networkx.complete_graph_as_cyjs(g, layout_algo=layout_algo)
 
     def send_graph(self, file_path: str):
-        self.logger.info('started send graph cyjs data')
+        self.logger.info('start sending graph cyjs data')
         self.transfer.send_data(self.conn, file_path)
         os.remove(file_path)
-        self.logger.info('finished send graph cyjs data')
+        self.logger.info('finish sending graph cyjs data')
 
     def send_styles(self, file_path: str):
-        self.logger.info('started send styles data')
+        self.logger.info('start sending styles data')
         self.transfer.send_data(self.conn, file_path)
-        self.logger.info('finished send styles data')
+        self.logger.info('finish sending styles data')
 
     def get_cytoscape_session(self, session_file_name):
-        self.logger.info('started get session data')
+        self.logger.info('start getting session data')
 
         if session_file_name is None:
             session_file_name = f'client_nx_graph_session_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.cys'
@@ -38,8 +38,8 @@ class Handler:
             session_file_name += '.cys'
 
         self.transfer.get_data(self.conn, session_file_name)
-        self.logger.info(f'session written in {session_file_name}')
-        self.logger.info('finished get session data')
+        self.logger.info(f'write session in {session_file_name}')
+        self.logger.info('finish getting session data')
 
     def handle(self, g: nx.Graph, cs_session_name=None, styles_filename=None, layout_algo='random'):
         file_path = self.complete_cyjs_from_graph(g, layout_algo)
