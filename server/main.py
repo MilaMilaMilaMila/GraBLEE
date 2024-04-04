@@ -64,7 +64,7 @@ if __name__ == '__main__':
     logger.info('run app')
     while True:
         conn, address = socket.accept()
-        logger.info("accepted connection from: " + str(address))
+        logger.info("accept connection from: " + str(address))
 
         handler.conn = conn
         handler.handle()
