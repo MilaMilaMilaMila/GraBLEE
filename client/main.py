@@ -45,7 +45,9 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
 
     # config
     config = configparser.ConfigParser()
-    config.read('/Users/mi.vorobeva/Desktop/IT/GraBLEE/client/business/config/config.ini')
+
+    config_path = os.path.abspath(__file__).replace(r'\main.py', '') + r'\business\config\config.ini'
+    config.read(config_path)
 
     # define connection
     connection_params = "CONNECTION_PARAMS"
