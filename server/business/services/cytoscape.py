@@ -2,9 +2,9 @@ from logging import Logger
 
 import py4cytoscape as p4c
 import xmltodict as xd
+from data_access.file_system import FileSystemRepo
 
 from ..models.session import Session
-from data_access.file_system import FileSystemRepo
 
 
 class Cytoscape:

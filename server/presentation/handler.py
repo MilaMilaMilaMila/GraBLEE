@@ -1,12 +1,11 @@
 import os
+from logging import Logger
+from socket import socket
 
-
-from business.services.transfer import Transfer
-from business.services.cytoscape import Cytoscape
 from business.models.datadto import DataDTO
 from business.models.session import Session
-from socket import socket
-from logging import Logger
+from business.services.cytoscape import Cytoscape
+from business.services.transfer import Transfer
 
 
 class Handler:
