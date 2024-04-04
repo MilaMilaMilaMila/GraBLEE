@@ -1,11 +1,14 @@
 import configparser
 import logging
-import colorlog
+import os
 import socket as sct
-from client.business.services.transfer import Transfer
-from client.business.services.nx import Networkx
-from client.presentation.handler import Handler
+
+import colorlog
 import networkx as nx
+
+from client.business.services.nx import Networkx
+from client.business.services.transfer import Transfer
+from client.presentation.handler import Handler
 
 
 def init_cytoscape_extension():
@@ -69,10 +72,3 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
                    cs_session_name=cs_session_name,
                    layout_algo=layout_algo,
                    styles_filename=styles_filename)
-
-
-
-
-
-
-
