@@ -9,6 +9,8 @@ networkx = "*"
 py4cytoscape = "*"
 xmltodict = "*"
 colorlog = "*"
+pandas = "*"
+numpy = "*"
 
 [dev-packages]
 

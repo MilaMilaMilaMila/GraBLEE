@@ -46,9 +46,9 @@ if __name__ == '__main__':
     port = int(config[connection_params]['port'])
     listeners_amount = int(config[connection_params]['listeners_amount'])
 
-    logger.info(f'defined host {host}')
-    logger.info(f'defined port {port}')
-    logger.info(f'defined listeners_amount {listeners_amount}')
+    logger.info(f'define host {host}')
+    logger.info(f'define port {port}')
+    logger.info(f'define listeners_amount {listeners_amount}')
 
     socket = sct.socket(sct.AF_INET, sct.SOCK_STREAM)
     socket.bind((host, port))
@@ -61,10 +61,10 @@ if __name__ == '__main__':
     # handler
     handler = Handler(transfer, cytoscape, logger)
 
-    logger.info('app run')
+    logger.info('run app')
     while True:
         conn, address = socket.accept()
-        logger.info("accepted connection from: " + str(address))
+        logger.info("accept connection from: " + str(address))
 
         handler.conn = conn
         handler.handle()

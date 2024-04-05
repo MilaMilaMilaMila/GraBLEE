@@ -17,8 +17,3 @@ graph.add_edge(4, 5)
 graph.to_cytoscape_session(cs_session_name='session',
                            layout_algo='circular',
                            styles_filename='styles_red.xml')
-
-
-
-
-

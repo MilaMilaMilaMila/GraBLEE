@@ -1,12 +1,11 @@
 import os
+from logging import Logger
+from socket import socket
 
-
-from business.services.transfer import Transfer
-from business.services.cytoscape import Cytoscape
 from business.models.datadto import DataDTO
 from business.models.session import Session
-from socket import socket
-from logging import Logger
+from business.services.cytoscape import Cytoscape
+from business.services.transfer import Transfer
 
 
 class Handler:
@@ -17,42 +16,42 @@ class Handler:
         self.logger = l
 
     def get_graph(self) -> DataDTO:
-        self.logger.info('started save graph data')
+        self.logger.info('start saving graph data')
 
         dto = DataDTO(object_type='GRAPH', file_format='cyjs')
         dto = self.transfer.get_data(self.conn, dto)
         self.logger.info(f'graph data saved in {dto.file_path}')
 
-        self.logger.info('finished save graph data')
+        self.logger.info('finish saving graph data')
 
         return dto
 
     def get_styles(self) -> DataDTO:
-        self.logger.info('started save styles data')
+        self.logger.info('start saving styles data')
 
         dto = DataDTO(object_type='STYLES', file_format='xml')
         dto = self.transfer.get_data(self.conn, dto)
         self.logger.info(f'styles data saved in {dto.file_path}')
 
-        self.logger.info('finished save styles data')
+        self.logger.info('finish saving styles data')
 
         return dto
 
     def create_cytoscape_session(self, cys: Session) -> Session:
-        self.logger.info('started create cytoscape session')
+        self.logger.info('start creating cytoscape session')
 
         cys = self.cytoscape.create_cytoscape_session(cys)
 
-        self.logger.info('finished create cytoscape session')
+        self.logger.info('finish creating cytoscape session')
 
         return cys
 
     def send_cytoscape_session(self, cys: Session):
-        self.logger.info('started send cytoscape session')
+        self.logger.info('start sending cytoscape session')
 
         self.transfer.send_data(self.conn, f'{cys.session_name}.cys')
 
-        self.logger.info('finished send cytoscape session')
+        self.logger.info('finish sending cytoscape session')
 
     def clean_work_dir(self, graph_dto: DataDTO, styles_dto: DataDTO, cys: Session):
         os.remove(graph_dto.file_path)

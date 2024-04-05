@@ -2,9 +2,9 @@ from logging import Logger
 
 import py4cytoscape as p4c
 import xmltodict as xd
+from data_access.file_system import FileSystemRepo
 
 from ..models.session import Session
-from data_access.file_system import FileSystemRepo
 
 
 class Cytoscape:
@@ -12,7 +12,7 @@ class Cytoscape:
         self.logger = logger
 
     def apply_style(self, styles_file_path):
-        self.logger.info('started apply styles')
+        self.logger.info('start applying styles')
         try:
             p4c.import_visual_styles(styles_file_path)
             data = FileSystemRepo.read(styles_file_path)
@@ -20,11 +20,11 @@ class Cytoscape:
             style_name = styles_dict['vizmap']['visualStyle']['@name']
             p4c.set_visual_style(style_name)
 
-            self.logger.info('finished apply styles')
+            self.logger.info('finish applying styles')
             return style_name
         except BaseException as e:
-            self.logger.error(f'applying styles: {e}')
-            self.logger.warning('styles weren\'t applied')
+            self.logger.error(f'apply styles: {e}')
+            self.logger.warning("styles hadn't applied")
             return ''
 
     def apply_layout(self):
@@ -42,11 +42,11 @@ class Cytoscape:
         cys.session_path = f'{cys.session_name}.cys'
 
         p4c.save_session(filename=cys.session_name)
-        self.logger.info('cytoscape session file saved')
+        self.logger.info('cytoscape session file is saved')
 
         p4c.delete_visual_style(cys.styles_name)
         suid = p4c.get_network_suid()
         p4c.delete_network(suid)
-        self.logger.info('cytoscape workspace cleaned')
+        self.logger.info('cytoscape workspace is cleaned')
 
         return cys

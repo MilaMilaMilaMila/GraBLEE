@@ -1,11 +1,14 @@
 import configparser
 import logging
-import colorlog
+import os
 import socket as sct
-from client.business.services.transfer import Transfer
-from client.business.services.nx import Networkx
-from client.presentation.handler import Handler
+
+import colorlog
 import networkx as nx
+
+from client.business.services.nx import Networkx
+from client.business.services.transfer import Transfer
+from client.presentation.handler import Handler
 
 
 def init_cytoscape_extension():
@@ -42,7 +45,9 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
 
     # config
     config = configparser.ConfigParser()
-    config.read('/Users/mi.vorobeva/Desktop/IT/GraBLEE/client/business/config/config.ini')
+
+    config_path = os.path.abspath(__file__).replace(r'\main.py', '') + r'\business\config\config.ini'
+    config.read(config_path)
 
     # define connection
     connection_params = "CONNECTION_PARAMS"
@@ -50,8 +55,8 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
     host = config[connection_params]['host']
     port = int(config[connection_params]['port'])
 
-    logger.info(f'defined host {host}')
-    logger.info(f'defined port {port}')
+    logger.info(f'define host {host}')
+    logger.info(f'define port {port}')
 
     socket = sct.socket(sct.AF_INET, sct.SOCK_STREAM)
     socket.connect((host, port))
@@ -63,16 +68,9 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
     # handler
     handler = Handler(transfer, nx, logger, socket)
 
-    logger.info('app run')
+    logger.info('run app')
 
     handler.handle(g=self,
                    cs_session_name=cs_session_name,
                    layout_algo=layout_algo,
                    styles_filename=styles_filename)
-
-
-
-
-
-
-
