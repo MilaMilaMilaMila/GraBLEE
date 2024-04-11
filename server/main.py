@@ -1,6 +1,6 @@
 import configparser
 import logging
-import socket as sct
+import socket
 
 import colorlog
 
@@ -52,10 +52,6 @@ if __name__ == '__main__':
     logger.info(f'define port {port}')
     logger.info(f'define listeners_amount {listeners_amount}')
 
-    socket = sct.socket(sct.AF_INET, sct.SOCK_STREAM)
-    socket.bind((host, port))
-    socket.listen(listeners_amount)
-
     # services
     transfer = Transfer(logger)
     cytoscape = Cytoscape(logger)
@@ -64,9 +60,12 @@ if __name__ == '__main__':
     handler = Handler(transfer, cytoscape, logger)
 
     logger.info('run app')
-    while True:
-        conn, address = socket.accept()
-        logger.info("accept connection from: " + str(address))
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((host, port))
+        s.listen(listeners_amount)
 
-        handler.conn = conn
-        handler.handle()
+        conn, address = s.accept()
+        logger.info("accept connection from: " + str(address))
+        with conn:
+            handler.conn = conn
+            handler.handle()
