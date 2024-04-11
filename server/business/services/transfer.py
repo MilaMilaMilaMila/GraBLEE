@@ -2,8 +2,8 @@ from datetime import datetime
 from logging import Logger
 from socket import socket
 
-from server.business.models.datadto import DataDTO
-from server.data_access.file_system import FileSystemRepo
+from business.models.datadto import DataDTO
+from data_access.file_system import FileSystemRepo
 
 
 class Transfer:
