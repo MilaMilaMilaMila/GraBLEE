@@ -52,6 +52,10 @@ if __name__ == '__main__':
     logger.info(f'define port {port}')
     logger.info(f'define listeners_amount {listeners_amount}')
 
+    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket.bind((host, port))
+    socket.listen(listeners_amount)
+
     # services
     transfer = Transfer(logger)
     cytoscape = Cytoscape(logger)
@@ -60,15 +64,9 @@ if __name__ == '__main__':
     handler = Handler(transfer, cytoscape, logger)
 
     logger.info('run app')
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((host, port))
-        s.listen(listeners_amount)
-
-        conn, address = s.accept()
+    while True:
+        conn, address = socket.accept()
         logger.info("accept connection from: " + str(address))
-        with conn:
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                conn.sendall(data)
+
+        handler.conn = conn
+        handler.handle()
