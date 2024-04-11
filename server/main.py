@@ -67,5 +67,8 @@ if __name__ == '__main__':
         conn, address = s.accept()
         logger.info("accept connection from: " + str(address))
         with conn:
-            handler.conn = conn
-            handler.handle()
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                conn.sendall(data)
