@@ -1,6 +1,3 @@
-from logging import Logger
-
-
 class FileSystemRepo:
     @staticmethod
     def read_binary(file_path: str) -> bytes:

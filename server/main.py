@@ -1,10 +1,12 @@
 import configparser
 import logging
-import colorlog
-from business.services.transfer import Transfer
-from business.services.cytoscape import Cytoscape
-from presentation.handler import Handler
 import socket as sct
+
+import colorlog
+
+from business.services.cytoscape import Cytoscape
+from business.services.transfer import Transfer
+from presentation.handler import Handler
 
 
 def new_logger():
