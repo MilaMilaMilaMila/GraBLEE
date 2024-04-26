@@ -59,6 +59,13 @@ class Handler:
         os.remove(cys.session_path)
 
     def handle(self):
+        conn_status = self.cytoscape.ping_cs()
+        if not conn_status:
+            self.transfer.send_cytoscape_connection_status(self.conn, status=conn_status)
+            return
+        else:
+            self.transfer.send_cytoscape_connection_status(self.conn, status=conn_status)
+
         cys = Session()
 
         graph_dto = self.get_graph()

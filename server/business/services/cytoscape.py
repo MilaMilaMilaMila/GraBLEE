@@ -2,6 +2,7 @@ from logging import Logger
 
 import py4cytoscape as p4c
 import xmltodict as xd
+import requests
 
 from server.business.models.session import Session
 from server.data_access.file_system import FileSystemRepo
@@ -10,6 +11,21 @@ from server.data_access.file_system import FileSystemRepo
 class Cytoscape:
     def __init__(self, logger: Logger):
         self.logger = logger
+
+    def ping_cs(self):
+        try:
+            p4c.cytoscape_ping()
+        except requests.exceptions.RequestException as e:
+            self.logger.error(e)
+            self.logger.warning("app can’t connect to Cytoscape or Cytoscape returns an error")
+            return 0
+        except p4c.CyError as e:
+            self.logger.error(e)
+            self.logger.warning("error connecting to CyREST or version is unsupported")
+            return 0
+
+        return 1
+
 
     def apply_style(self, styles_file_path):
         self.logger.info('start applying styles')

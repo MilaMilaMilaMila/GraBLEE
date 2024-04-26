@@ -64,7 +64,15 @@ if __name__ == '__main__':
     handler = Handler(transfer, cytoscape, logger)
 
     logger.info('run app')
+
+    conn_status = handler.cytoscape.ping_cs()
+    if not conn_status:
+        handler.logger.warning("You can't continue work with app until fix cytoscape connection error")
+    else:
+        handler.logger.info("App successfully connect to Cytoscape")
+
     while True:
+
         conn, address = socket.accept()
         logger.info("accept connection from: " + str(address))
 

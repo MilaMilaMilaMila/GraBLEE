@@ -1,11 +1,13 @@
 import logging
 import socket as sct
+import os
+import configparser
 
 import colorlog
 import networkx as nx
 
 from client.business.services.nx import Networkx
-from client.business.services.transfer import Transfer, get_config_params
+from client.business.services.transfer import Transfer
 from client.presentation.handler import Handler
 
 

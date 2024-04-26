@@ -11,6 +11,16 @@ class Transfer:
         self.logger = logger
         self.package_size = 1024
 
+    def send_cytoscape_connection_status(self, conn: socket, status: bool):
+        self.logger.info('start sending cytoscape connection status')
+
+        status_bin = status.to_bytes(length=8, byteorder='big')
+        conn.send(status_bin)
+        response = conn.recv(self.package_size).decode()
+        self.logger.info(f'client response: {response}')
+
+        self.logger.info('finish sending cytoscape connection status')
+
     def get_data_len(self, conn: socket) -> int:
         self.logger.info('start getting data len')
 

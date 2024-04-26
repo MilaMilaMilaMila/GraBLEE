@@ -43,6 +43,11 @@ class Handler:
         self.logger.info('finish getting session data')
 
     def handle(self, g: nx.Graph, cs_session_name=None, styles_filename=None, layout_algo='random'):
+        cytoscape_connection_status = self.transfer.get_cytoscape_connection_status(self.conn)
+        if not cytoscape_connection_status:
+            self.logger.error("Cannot find local or remote Cytoscape. Start Cytoscape and then proceed.")
+            return
+
         file_path = self.complete_cyjs_from_graph(g, layout_algo)
 
         self.send_graph(file_path)
