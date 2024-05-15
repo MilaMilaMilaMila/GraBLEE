@@ -15,7 +15,7 @@ class Transfer:
         self.logger.info('start sending cytoscape connection status')
 
         status_bin = status.to_bytes(length=8, byteorder='big')
-        conn.send(status_bin)
+        conn.send(status_bin+b'\n')
         self.logger.info(f'status {status} was sent')
         response = conn.recv(self.package_size).decode()
         self.logger.info(f'client response: {response}')
