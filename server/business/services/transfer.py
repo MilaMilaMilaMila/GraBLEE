@@ -16,6 +16,7 @@ class Transfer:
 
         status_bin = status.to_bytes(length=8, byteorder='big')
         conn.send(status_bin)
+        self.logger.info(f'status {status} was sent')
         response = conn.recv(self.package_size).decode()
         self.logger.info(f'client response: {response}')
 
