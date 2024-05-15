@@ -16,9 +16,9 @@ class Transfer:
 
         status = conn.recv(self.package_size)
         status = int.from_bytes(status, byteorder='big')
-        msg = f'received cytoscape connection status: {status}'
-        self.logger.info(msg)
-        conn.send(msg.encode())
+        # msg = f'received cytoscape connection status: {status}'
+        # self.logger.info(msg)
+        # conn.send(msg.encode())
 
         self.logger.info('finish getting cytoscape connection status')
 
