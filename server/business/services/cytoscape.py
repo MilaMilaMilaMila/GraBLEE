@@ -3,9 +3,13 @@ from logging import Logger
 import py4cytoscape as p4c
 import xmltodict as xd
 import requests
+import os
+import sys
 
-from server.business.models.session import Session
-from server.data_access.file_system import FileSystemRepo
+sys.path.append(os.getcwd())
+print(os.getcwd())
+from business.models.session import Session
+from data_access.file_system import FileSystemRepo
 
 
 class Cytoscape:

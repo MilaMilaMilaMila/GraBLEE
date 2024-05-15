@@ -1,6 +1,7 @@
 import configparser
 import logging
 import socket as sct
+import os
 
 import colorlog
 
@@ -34,6 +35,8 @@ def new_logger():
 
 
 if __name__ == '__main__':
+    print(os.getcwd())
+
     # logger
     logger = new_logger()
 
