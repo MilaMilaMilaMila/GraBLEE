@@ -2,8 +2,8 @@ from datetime import datetime
 from logging import Logger
 from socket import socket
 
-from business.models.datadto import DataDTO
-from data_access.file_system import FileSystemRepo
+from server.business.models.datadto import DataDTO
+from server.data_access.file_system import FileSystemRepo
 
 
 class Transfer:
@@ -11,7 +11,7 @@ class Transfer:
         self.logger = logger
         self.package_size = 1024
 
-    def send_cytoscape_connection_status(self, conn: socket, status: bool):
+    def send_cytoscape_connection_status(self, conn: socket, status: int):
         self.logger.info('start sending cytoscape connection status')
 
         status_bin = status.to_bytes(length=8, byteorder='big')
