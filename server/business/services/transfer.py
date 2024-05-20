@@ -9,7 +9,7 @@ from data_access.file_system import FileSystemRepo
 class Transfer:
     def __init__(self, logger: Logger):
         self.logger = logger
-        self.package_size = 1024
+        self.package_size = 512
 
     def send_cytoscape_connection_status(self, conn: socket, status: int):
         self.logger.info('start sending cytoscape connection status')

@@ -74,3 +74,5 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
                    cs_session_name=cs_session_name,
                    layout_algo=layout_algo,
                    styles_filename=styles_filename)
+
+    socket.close()

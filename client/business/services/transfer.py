@@ -9,14 +9,11 @@ from client.data_access.file_system import FileSystemRepo
 class Transfer:
     def __init__(self, logger: Logger):
         self.logger = logger
-        self.package_size = 1024
+        self.package_size = 512
 
     def get_cytoscape_connection_status(self, conn: socket) -> int:
         self.logger.info('start getting cytoscape connection status')
-
-        status = conn.recv(self.package_size).split(b'\n')
-        print(status)
-        status = status[0]
+        status = conn.recv(self.package_size)
         status = int.from_bytes(status, byteorder='big')
         self.logger.info(f'status {status} was got')
         msg = f'received cytoscape connection status: {status}'
