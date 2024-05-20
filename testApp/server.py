@@ -3,7 +3,7 @@ import socket as sct
 
 if __name__ == '__main__':
     host = "84.38.181.98"
-    port = 23
+    port = 21
     pcg_size = 1024
     listeners_amount = 2
 
