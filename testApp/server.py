@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     print('start sending cytoscape connection status')
     status = 1
-    status_bin = status.to_bytes(byteorder='big')
+    status_bin = status.to_bytes(length=8, byteorder='big')
     conn.send(status_bin)
     print(f'status {status} was sent')
     response = conn.recv(pcg_size).decode()
