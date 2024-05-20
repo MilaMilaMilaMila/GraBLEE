@@ -14,7 +14,6 @@ class Transfer:
     def get_cytoscape_connection_status(self, conn: socket) -> int:
         self.logger.info('start getting cytoscape connection status')
 
-        status = []
         status = conn.recv(self.package_size).split(b'\n')
         print(status)
         status = status[0]
