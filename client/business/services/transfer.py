@@ -1,7 +1,6 @@
-import configparser
-import os
 from logging import Logger
 from socket import socket
+import math
 
 from client.data_access.file_system import FileSystemRepo
 
@@ -9,7 +8,7 @@ from client.data_access.file_system import FileSystemRepo
 class Transfer:
     def __init__(self, logger: Logger):
         self.logger = logger
-        self.package_size = 512
+        self.package_size = 1024
 
     def get_cytoscape_connection_status(self, conn: socket) -> int:
         self.logger.info('start getting cytoscape connection status')
@@ -54,21 +53,22 @@ class Transfer:
         self.logger.info('start getting data')
 
         received_data_len = 0
-        while received_data_len < data_len:
+        batches_amount = int(math.ceil(data_len / self.package_size))
+        for i in range(batches_amount):
             try:
                 batch = conn.recv(min(self.package_size, data_len - received_data_len))
-                conn.send('ok'.encode())
             except BaseException as e:
-                self.logger.error(f'getting data: {e}')
-                self.logger.info('app was terminated')
+                err_msg = f'getting data batch error: {e}'
+                conn.send(err_msg.encode())
+                self.logger.error(err_msg)
+                self.logger.info('app is terminated')
                 exit()
 
-            if not batch:
-                self.logger.info('finish getting data')
-                break
+            conn.send('ok'.encode())
 
             FileSystemRepo.write_binary(file_path, batch)
             received_data_len += len(batch)
+            print(len(batch))
 
         msg = f'received bytes: {received_data_len}'
         self.logger.info(msg)
@@ -87,7 +87,7 @@ class Transfer:
             response = conn.recv(self.package_size).decode()
 
             if response != 'ok':
-                self.logger.error('getting data batch error')
+                self.logger.error(response)
                 self.logger.info('app was terminated')
                 exit()
 

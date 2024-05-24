@@ -13,8 +13,8 @@ from presentation.handler import Handler
 def new_logger():
     handler = colorlog.StreamHandler()
     handler.setFormatter(colorlog.ColoredFormatter(
-        '%(white)sSERVER: %(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s',
-        datefmt=None,
+        '%(white)s%(asctime)s %(white)sSERVER: %(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s ',
+        datefmt='%Y-%m-%d %H:%M:%S',
         reset=True,
         log_colors={
             'DEBUG': 'cyan',
@@ -34,9 +34,17 @@ def new_logger():
     return logger
 
 
-if __name__ == '__main__':
-    print(os.getcwd())
+def clean_work_dir_after_fail(logger):
+    work_dir = os.getcwd()
+    logger.info(f'working dir {work_dir}')
 
+    for filename in os.listdir(work_dir):
+        if 'GRAPH' in filename or 'STYLES' in filename:
+            file_path = os.path.join(work_dir, filename)
+            os.remove(file_path)
+
+
+if __name__ == '__main__':
     # logger
     logger = new_logger()
 
@@ -76,8 +84,21 @@ if __name__ == '__main__':
 
     while True:
 
-        conn, address = socket.accept()
-        logger.info("accept connection from: " + str(address))
+        try:
+            conn, address = socket.accept()
+            logger.info("accept connection from: " + str(address))
+            timeout_seconds = 60
+            conn.settimeout(timeout_seconds)
 
-        handler.conn = conn
-        handler.handle()
+        except BaseException as e:
+            logger.error(f'accepting connection: {e}')
+
+        else:
+            try:
+                handler.conn = conn
+                handler.handle()
+
+            except BaseException as e:
+                logger.error(f'handling connection request: {e}')
+                handler.conn.close()
+                clean_work_dir_after_fail(logger)

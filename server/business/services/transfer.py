@@ -1,6 +1,7 @@
 from datetime import datetime
 from logging import Logger
 from socket import socket
+import math
 
 from business.models.datadto import DataDTO
 from data_access.file_system import FileSystemRepo
@@ -9,13 +10,13 @@ from data_access.file_system import FileSystemRepo
 class Transfer:
     def __init__(self, logger: Logger):
         self.logger = logger
-        self.package_size = 512
+        self.package_size = 1024
 
     def send_cytoscape_connection_status(self, conn: socket, status: int):
         self.logger.info('start sending cytoscape connection status')
 
         status_bin = status.to_bytes(length=8, byteorder='big')
-        conn.send(status_bin+b'\n')
+        conn.send(status_bin)
         self.logger.info(f'status {status} was sent')
         response = conn.recv(self.package_size).decode()
         self.logger.info(f'client response: {response}')
@@ -56,18 +57,18 @@ class Transfer:
         dto.file_path = full_file_name
 
         received_data_len = 0
-        while received_data_len < data_len:
+        batches_amount = int(math.ceil(data_len / self.package_size))
+        for i in range(batches_amount):
             try:
                 batch = conn.recv(min(self.package_size, data_len - received_data_len))
-                conn.send('ok'.encode())
             except BaseException as e:
-                self.logger.error(f'getting data: {e}')
+                err_msg = f'getting data batch error: {e}'
+                conn.send(err_msg.encode())
+                self.logger.error(err_msg)
                 self.logger.info('app is terminated')
                 exit()
 
-            if not batch:
-                self.logger.info('finish getting data')
-                break
+            conn.send('ok'.encode())
 
             FileSystemRepo.write_binary(full_file_name, batch)
             received_data_len += len(batch)

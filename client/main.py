@@ -18,8 +18,8 @@ def init_cytoscape_extension():
 def new_logger():
     handler = colorlog.StreamHandler()
     handler.setFormatter(colorlog.ColoredFormatter(
-        '%(white)sCLIENT: %(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s',
-        datefmt=None,
+        '%(white)s%(asctime)s %(white)sCLIENT: %(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
         reset=True,
         log_colors={
             'DEBUG': 'cyan',
@@ -59,6 +59,8 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
     logger.info(f'define port {port}')
 
     socket = sct.socket(sct.AF_INET, sct.SOCK_STREAM)
+    timeout_seconds = 60
+    socket.settimeout(timeout_seconds)
     socket.connect((host, port))
 
     # services
@@ -70,9 +72,12 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
 
     logger.info('run app')
 
-    handler.handle(g=self,
-                   cs_session_name=cs_session_name,
-                   layout_algo=layout_algo,
-                   styles_filename=styles_filename)
+    try:
+        handler.handle(g=self,
+                       cs_session_name=cs_session_name,
+                       layout_algo=layout_algo,
+                       styles_filename=styles_filename)
+    except BaseException as e:
+        logger.error(f'handling request: {e}')
 
     socket.close()

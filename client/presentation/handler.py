@@ -50,7 +50,11 @@ class Handler:
 
         file_path = self.complete_cyjs_from_graph(g, layout_algo)
 
-        self.send_graph(file_path)
+        try:
+            self.send_graph(file_path)
+        except BaseException as e:
+            self.logger.error(f'sending graph: {e}')
+            os.remove(file_path)
 
         self.send_styles(styles_filename)
 
