@@ -36,3 +36,16 @@ python3 main.py
 ```
 
 # Запуск клиентской части
+
+Чтобы начать использовать функцию получкния Cytoscape session нужно инициализировтаь клиент в вашей программе. Для этого напишите следующее:
+```py
+# path to client can be differ
+from client.main import init_cytoscape_extension
+
+# your code
+
+# add cytoscape extension to networkx.Graph
+init_cytoscape_extension()
+
+# your code
+```
