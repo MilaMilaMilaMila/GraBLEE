@@ -2,6 +2,7 @@ import configparser
 import logging
 import socket as sct
 import os
+import threading
 
 import colorlog
 
@@ -96,7 +97,9 @@ if __name__ == '__main__':
         else:
             try:
                 handler.conn = conn
-                handler.handle()
+                # handler.handle()
+                thread = threading.Thread(target=handler.handle)
+                thread.start()
 
             except BaseException as e:
                 logger.error(f'handling connection request: {e}')

@@ -6,8 +6,6 @@ import requests
 import os
 import sys
 
-sys.path.append(os.getcwd())
-print(os.getcwd())
 from business.models.session import Session
 from data_access.file_system import FileSystemRepo
 

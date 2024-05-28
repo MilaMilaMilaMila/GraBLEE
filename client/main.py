@@ -1,7 +1,7 @@
 import logging
 import socket as sct
-import os
 import configparser
+from pathlib import Path
 
 import colorlog
 import networkx as nx
@@ -46,7 +46,9 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
     # config
     config = configparser.ConfigParser()
 
-    config_path = os.path.abspath(__file__).replace(r'\main.py', '') + r'\business\config\config.ini'
+    current_file = Path(__file__).resolve()
+    container_dir = current_file.parent
+    config_path = container_dir / 'business' / 'config' / 'config.ini'
     config.read(config_path)
 
     # define connection

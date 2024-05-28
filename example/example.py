@@ -12,6 +12,7 @@ graph.add_edge(1, 5)
 graph.add_edge(2, 3)
 graph.add_edge(3, 4)
 graph.add_edge(4, 5)
+graph.add_edge(5, 6)
 
 # get cytoscape session file in the current file directory
 graph.to_cytoscape_session(cs_session_name='session',
