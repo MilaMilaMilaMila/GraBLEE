@@ -1,6 +1,7 @@
 import os
 from logging import Logger
 from socket import socket
+import threading
 
 from business.models.datadto import DataDTO
 from business.models.session import Session
@@ -14,6 +15,7 @@ class Handler:
         self.cytoscape = c
         self.conn = conn
         self.logger = l
+        self.lock = threading.Lock()
 
     def get_graph(self) -> DataDTO:
         self.logger.info('start saving graph data')
@@ -40,7 +42,11 @@ class Handler:
     def create_cytoscape_session(self, cys: Session) -> Session:
         self.logger.info('start creating cytoscape session')
 
-        cys = self.cytoscape.create_cytoscape_session(cys)
+        self.lock.acquire()
+        try:
+            cys = self.cytoscape.create_cytoscape_session(cys)
+        finally:
+            self.lock.release()
 
         self.logger.info('finish creating cytoscape session')
 
