@@ -84,18 +84,14 @@ if __name__ == '__main__':
         handler.logger.info("App successfully connect to Cytoscape")
 
     while True:
-
         try:
             conn, address = socket.accept()
             logger.info("accept connection from: " + str(address))
             timeout_seconds = 60
             conn.settimeout(timeout_seconds)
 
-        except BaseException as e:
-            if e is "":
-                exit(0)
-            else:
-                logger.error(f'accepting connection: {e}')
+        except sct.error as e:
+            logger.error(f'accepting connection: {e}')
 
         else:
             try:
@@ -104,10 +100,7 @@ if __name__ == '__main__':
                 thread = threading.Thread(target=handler.handle)
                 thread.start()
 
-            except BaseException as e:
-                if e is "":
-                    exit(0)
-                else:
-                    logger.error(f'handling connection request: {e}')
-                    handler.conn.close()
-                    clean_work_dir_after_fail(logger)
+            except sct.error as e:
+                logger.error(f'handling connection request: {e}')
+                handler.conn.close()
+                clean_work_dir_after_fail(logger)
