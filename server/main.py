@@ -92,7 +92,7 @@ if __name__ == '__main__':
             conn.settimeout(timeout_seconds)
 
         except BaseException as e:
-            if e is None:
+            if e is "":
                 exit(0)
             else:
                 logger.error(f'accepting connection: {e}')
@@ -105,7 +105,7 @@ if __name__ == '__main__':
                 thread.start()
 
             except BaseException as e:
-                if e is None:
+                if e is "":
                     exit(0)
                 else:
                     logger.error(f'handling connection request: {e}')
