@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+
+path_root = Path(__file__).parents[1]
+sys.path.append(str(path_root))
+
 import networkx as nx
 from client.main import init_cytoscape_extension
 
