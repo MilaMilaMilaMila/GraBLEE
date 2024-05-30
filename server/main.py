@@ -11,10 +11,10 @@ from business.services.transfer import Transfer
 from presentation.handler import Handler
 
 
-def new_logger():
+def new_logger(address):
     handler = colorlog.StreamHandler()
     handler.setFormatter(colorlog.ColoredFormatter(
-        '%(white)s%(asctime)s %(white)sSERVER: %(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s ',
+        f'%(white)s%(asctime)s %(purple)s{address} %(white)sSERVER: %(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s ',
         datefmt='%Y-%m-%d %H:%M:%S',
         reset=True,
         log_colors={
@@ -28,7 +28,7 @@ def new_logger():
         style='%'
     ))
 
-    logger = colorlog.getLogger('example')
+    logger = colorlog.getLogger(address)
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
 
@@ -47,7 +47,7 @@ def clean_work_dir_after_fail(logger):
 
 if __name__ == '__main__':
     # logger
-    logger = new_logger()
+    logger = new_logger('127.0.0.1')
 
     # config
     config = configparser.ConfigParser()
@@ -95,12 +95,17 @@ if __name__ == '__main__':
 
         else:
             try:
-                handler.conn = conn
+                cur_connection_logger = new_logger(address[0])
+                cur_connection_transfer = Transfer(cur_connection_logger)
+                cur_connection_cytoscape = Cytoscape(cur_connection_logger)
+                cur_connection_handler = Handler(cur_connection_transfer, cur_connection_cytoscape, cur_connection_logger)
+
+                cur_connection_handler.conn = conn
                 # handler.handle()
-                thread = threading.Thread(target=handler.handle)
+                thread = threading.Thread(target=cur_connection_handler.handle)
                 thread.start()
 
             except sct.error as e:
-                logger.error(f'handling connection request: {e}')
-                handler.conn.close()
+                logger.error(f'handling connection request: {e} with address {address[0]}')
+                # handler.conn.close()
                 clean_work_dir_after_fail(logger)
