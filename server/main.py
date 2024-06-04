@@ -35,6 +35,12 @@ def new_logger(address):
     return logger
 
 
+def delete_logger(logger):
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
+    logging.Logger.manager.loggerDict.pop(logger.name)
+
+
 def clean_work_dir_after_fail(logger):
     work_dir = os.getcwd()
     logger.info(f'working dir {work_dir}')
@@ -43,6 +49,24 @@ def clean_work_dir_after_fail(logger):
         if 'GRAPH' in filename or 'STYLES' in filename:
             file_path = os.path.join(work_dir, filename)
             os.remove(file_path)
+
+
+def handle(host_address, conn):
+    try:
+        cur_connection_logger = new_logger(host_address)
+        cur_connection_transfer = Transfer(cur_connection_logger)
+        cur_connection_cytoscape = Cytoscape(cur_connection_logger)
+        cur_connection_handler = Handler(cur_connection_transfer, cur_connection_cytoscape, cur_connection_logger)
+
+        cur_connection_handler.conn = conn
+        cur_connection_handler.handle()
+    except sct.error as e:
+        logger.error(f'handling connection {address[0]} request: {e}')
+        handler.conn.close()
+        # TODO clean_work_dir_after_fail(logger) как-то это сделать
+    finally:
+        if 'cur_connection_logger' in locals():
+            delete_logger(cur_connection_logger)
 
 
 if __name__ == '__main__':
@@ -94,18 +118,5 @@ if __name__ == '__main__':
             logger.error(f'accepting connection: {e}')
 
         else:
-            try:
-                cur_connection_logger = new_logger(address[0])
-                cur_connection_transfer = Transfer(cur_connection_logger)
-                cur_connection_cytoscape = Cytoscape(cur_connection_logger)
-                cur_connection_handler = Handler(cur_connection_transfer, cur_connection_cytoscape, cur_connection_logger)
-
-                cur_connection_handler.conn = conn
-                # handler.handle()
-                thread = threading.Thread(target=cur_connection_handler.handle)
-                thread.start()
-
-            except sct.error as e:
-                logger.error(f'handling connection request: {e} with address {address[0]}')
-                # handler.conn.close()
-                clean_work_dir_after_fail(logger)
+            thread = threading.Thread(target=handle, args=(address[0], conn))
+            thread.start()
