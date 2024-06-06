@@ -73,7 +73,7 @@ class Transfer:
         msg = f'received bytes: {received_data_len}'
         self.logger.info(msg)
 
-        conn.send(msg.encode())
+        # conn.send(msg.encode())
 
     def send_data(self, conn: socket, file_path: str):
         data = FileSystemRepo.read_binary(file_path)
