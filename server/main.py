@@ -100,7 +100,7 @@ if __name__ == '__main__':
     lock = threading.Lock()
 
     # handler
-    handler = Handler(transfer, cytoscape, logger)
+    handler = Handler(transfer, cytoscape, logger, lock)
 
     logger.info('run app')
 
