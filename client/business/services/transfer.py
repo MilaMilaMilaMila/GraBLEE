@@ -63,12 +63,12 @@ class Transfer:
                 self.logger.error(err_msg)
                 self.logger.info('app is terminated')
                 exit()
-
-            conn.send('ok'.encode())
+            else:
+                conn.send('ok'.encode())
 
             FileSystemRepo.write_binary(file_path, batch)
             received_data_len += len(batch)
-            print(len(batch))
+            self.logger.debug(len(batch))
 
         msg = f'received bytes: {received_data_len}'
         self.logger.info(msg)

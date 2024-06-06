@@ -90,9 +90,10 @@ class Transfer:
         for i in range(0, data_len, self.package_size):
             conn.send(data[i:min(i + self.package_size, data_len)])
             response = conn.recv(self.package_size).decode()
+            self.logger.debug(f'{response}')
 
             if response != 'ok':
-                self.logger.error('getting data batch error')
+                self.logger.error('sending data batch error:')
                 self.logger.info('app is terminated')
                 exit()
 
