@@ -51,12 +51,12 @@ def clean_work_dir_after_fail(logger):
             os.remove(file_path)
 
 
-def handle(host_address, conn):
+def handle(host_address, conn, lock):
     try:
         cur_connection_logger = new_logger(host_address)
         cur_connection_transfer = Transfer(cur_connection_logger)
         cur_connection_cytoscape = Cytoscape(cur_connection_logger)
-        cur_connection_handler = Handler(cur_connection_transfer, cur_connection_cytoscape, cur_connection_logger)
+        cur_connection_handler = Handler(cur_connection_transfer, cur_connection_cytoscape, cur_connection_logger, lock)
 
         cur_connection_handler.conn = conn
         cur_connection_handler.handle()
@@ -96,6 +96,9 @@ if __name__ == '__main__':
     transfer = Transfer(logger)
     cytoscape = Cytoscape(logger)
 
+    # mutex
+    lock = threading.Lock()
+
     # handler
     handler = Handler(transfer, cytoscape, logger)
 
@@ -118,5 +121,5 @@ if __name__ == '__main__':
             logger.error(f'accepting connection: {e}')
 
         else:
-            thread = threading.Thread(target=handle, args=(address[0], conn))
+            thread = threading.Thread(target=handle, args=(address[0], conn, lock))
             thread.start()

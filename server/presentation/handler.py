@@ -10,12 +10,12 @@ from business.services.transfer import Transfer
 
 
 class Handler:
-    def __init__(self, t: Transfer, c: Cytoscape, l: Logger, conn: socket = None):
+    def __init__(self, t: Transfer, c: Cytoscape, l: Logger, lock: threading.Lock, conn: socket = None):
         self.transfer = t
         self.cytoscape = c
         self.conn = conn
         self.logger = l
-        self.lock = threading.Lock()
+        self.lock = lock
 
     def get_graph(self) -> DataDTO:
         self.logger.info('start saving graph data')
@@ -42,11 +42,7 @@ class Handler:
     def create_cytoscape_session(self, cys: Session) -> Session:
         self.logger.info('start creating cytoscape session')
 
-        self.lock.acquire()
-        try:
-            cys = self.cytoscape.create_cytoscape_session(cys)
-        finally:
-            self.lock.release()
+        cys = self.cytoscape.create_cytoscape_session(cys)
 
         self.logger.info('finish creating cytoscape session')
 
@@ -81,7 +77,10 @@ class Handler:
         cys.styles_name = styles_dto.file_name
         cys.styles_file_path = styles_dto.file_path
 
+        self.lock.acquire()
         cys = self.create_cytoscape_session(cys)
+        self.lock.release()
+
         self.send_cytoscape_session(cys)
 
         self.clean_work_dir(graph_dto, styles_dto, cys)
