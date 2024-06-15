@@ -57,3 +57,7 @@ init_cytoscape_extension()
 # your code
 ```
 В папке example есть файл example.py, в котором приведен пример использования функции получения сессии.
+
+# Способы решения некоторых проблем
+
+- При работе с большими графами приложению Cytoscape может быть недостаточно оператичной памяти и памяти в стеке. Эти параметры можно настроить в файле Cytoscape.vmoptions, который находится в директории исполняемого файла Cytoscape. https://manual.cytoscape.org/en/latest/Launching_Cytoscape.html#overall-memory-size-for-cytoscape - здесь можно подробнее узнать, как настроить размер оперативной памяти, https://www.baeldung.com/jvm-configure-stack-sizes#custom - здесь можно найти информацию по изменению размера стека
