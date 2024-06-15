@@ -1,5 +1,7 @@
-import networkx as nx
+import zipfile
+import os
 import json
+
 
 class FileSystemRepo:
     @staticmethod
@@ -20,3 +22,15 @@ class FileSystemRepo:
         file = open(file_path, 'w')
         json.dump(data, file)
         file.close()
+
+    @staticmethod
+    def zip(file_name):
+        zip_name = file_name + '.zip'
+        with zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            zipf.write(file_name, os.path.basename(file_name))
+
+    @staticmethod
+    def unzip(zip_file_name):
+        destination_folder = os.getcwd()
+        with zipfile.ZipFile(zip_file_name, 'r') as zipf:
+            zipf.extractall(path=destination_folder)
