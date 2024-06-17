@@ -61,7 +61,7 @@ def main(self, cs_session_name=None, layout_algo='random', styles_filename=None)
     logger.info(f'define port {port}')
 
     socket = sct.socket(sct.AF_INET, sct.SOCK_STREAM)
-    timeout_seconds = 60
+    timeout_seconds = 60 * 10
     socket.settimeout(timeout_seconds)
     socket.connect((host, port))
 

@@ -32,10 +32,13 @@ class Cytoscape:
     def apply_style(self, styles_file_path):
         self.logger.info('start applying styles')
         try:
+
             p4c.import_visual_styles(styles_file_path)
             data = FileSystemRepo.read(styles_file_path)
             styles_dict = xd.parse(data)
             style_name = styles_dict['vizmap']['visualStyle']['@name']
+
+            p4c.create_view()
             p4c.set_visual_style(style_name)
 
             self.logger.info('finish applying styles')
@@ -62,7 +65,8 @@ class Cytoscape:
         p4c.save_session(filename=cys.session_name)
         self.logger.info('cytoscape session file is saved')
 
-        p4c.delete_visual_style(cys.styles_name)
+        if cys.styles_file_path:
+            p4c.delete_visual_style(cys.styles_name)
         suid = p4c.get_network_suid()
         p4c.delete_network(suid)
         self.logger.info('cytoscape workspace is cleaned')

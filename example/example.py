@@ -20,7 +20,12 @@ graph.add_edge(3, 4)
 graph.add_edge(4, 5)
 graph.add_edge(5, 6)
 
+# с помощью этой части кода я создвала большие графы
+# for i in range(6, 100000):
+#     graph.add_edge(i, i + 1)
+
 # get cytoscape session file in the current file directory
 graph.to_cytoscape_session(cs_session_name='session',
                            layout_algo='circular',
-                           styles_filename='styles_red.xml')
+                           styles_filename='styles_red.xml'
+                           )

@@ -31,6 +31,14 @@ class FileSystemRepo:
 
     @staticmethod
     def unzip(zip_file_name):
+        new_file_name = zip_file_name[0:-4]
         destination_folder = os.getcwd()
+        new_file_path = os.path.join(destination_folder, new_file_name)
+        if os.path.exists(new_file_path):
+            os.remove(new_file_path)
         with zipfile.ZipFile(zip_file_name, 'r') as zipf:
-            zipf.extractall(path=destination_folder)
+            for filename in zipf.namelist():
+                if not filename.endswith('/'):
+                    zipf.extract(filename, path=destination_folder)
+                    os.rename(os.path.join(destination_folder, filename), new_file_path)
+

@@ -10,6 +10,18 @@ class Transfer:
         self.logger = logger
         self.package_size = 1024
 
+    def zip(self, file_name) -> str:
+        self.logger.info('start archiving file')
+        FileSystemRepo.zip(file_name)
+        self.logger.info('end archiving file')
+        return file_name + '.zip'
+
+    def unzip(self, zip_file_name) -> str:
+        self.logger.info('start unpacking file')
+        FileSystemRepo.unzip(zip_file_name)
+        self.logger.info('end unpacking file')
+        return zip_file_name[0:-4]
+
     def get_cytoscape_connection_status(self, conn: socket) -> int:
         self.logger.info('start getting cytoscape connection status')
         status = conn.recv(self.package_size)
@@ -46,6 +58,9 @@ class Transfer:
         self.logger.info(f'server response: {response}')
 
         self.logger.info('finish sending data len')
+
+    def send_styles_status_data(self, conn: socket, with_styles: int):
+        self.send_data_len(conn, with_styles)
 
     def get_data(self, conn: socket, file_path: str):
         data_len = self.get_data_len(conn)

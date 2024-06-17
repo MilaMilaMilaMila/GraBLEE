@@ -17,13 +17,26 @@ class Handler:
         self.logger = l
         self.lock = lock
 
+    def get_styles_status_data(self):
+        self.logger.info('start saving content info data')
+
+        styles_status = self.transfer.get_data()
+
+        self.logger.info('finish saving content info data')
+
+        return styles_status
+
     def get_graph(self) -> DataDTO:
         self.logger.info('start saving graph data')
 
         dto = DataDTO(object_type='GRAPH', file_format='cyjs')
-        dto = self.transfer.get_data(self.conn, dto)
+        zip_dto = DataDTO(object_type='GRAPH', file_format='cyjs.zip')
+        zip_dto = self.transfer.get_data(self.conn, zip_dto)
+        self.logger.info(f'archived graph data saved in {zip_dto.file_path}')
+        dto_file_name = self.transfer.unzip(zip_dto.file_path)
+        dto.file_name = zip_dto.file_name
+        dto.file_path = f'{dto.file_name}.{dto.file_format}'
         self.logger.info(f'graph data saved in {dto.file_path}')
-
         self.logger.info('finish saving graph data')
 
         return dto
@@ -32,9 +45,13 @@ class Handler:
         self.logger.info('start saving styles data')
 
         dto = DataDTO(object_type='STYLES', file_format='xml')
-        dto = self.transfer.get_data(self.conn, dto)
+        zip_dto = DataDTO(object_type='STYLES', file_format='xml.zip')
+        zip_dto = self.transfer.get_data(self.conn, zip_dto)
+        self.logger.info(f'archived styles data saved in {zip_dto.file_path}')
+        dto_file_name = self.transfer.unzip(zip_dto.file_path)
+        dto.file_name = zip_dto.file_name
+        dto.file_path = f'{dto.file_name}.{dto.file_format}'
         self.logger.info(f'styles data saved in {dto.file_path}')
-
         self.logger.info('finish saving styles data')
 
         return dto
@@ -51,14 +68,22 @@ class Handler:
     def send_cytoscape_session(self, cys: Session):
         self.logger.info('start sending cytoscape session')
 
-        self.transfer.send_data(self.conn, f'{cys.session_name}.cys')
+        zip_session_file_name = self.transfer.zip(f'{cys.session_name}.cys')
+        self.transfer.send_data(self.conn, zip_session_file_name)
 
         self.logger.info('finish sending cytoscape session')
 
-    def clean_work_dir(self, graph_dto: DataDTO, styles_dto: DataDTO, cys: Session):
+    def clean_work_dir(self, graph_dto: DataDTO, cys: Session, styles_dto=None):
         os.remove(graph_dto.file_path)
-        os.remove(styles_dto.file_path)
+        os.remove(f'{graph_dto.file_path}.zip')
+        if styles_dto:
+            os.remove(styles_dto.file_path)
+            os.remove(f'{styles_dto.file_path}.zip')
         os.remove(cys.session_path)
+        os.remove(f'{cys.session_path}.zip')
+
+    def get_styles_status(self):
+        return self.transfer.get_styles_status_data(self.conn)
 
     def handle(self):
         conn_status = self.cytoscape.ping_cs()
@@ -68,14 +93,18 @@ class Handler:
         else:
             self.transfer.send_cytoscape_connection_status(self.conn, status=conn_status)
 
+        with_styles = self.get_styles_status()
+
         cys = Session()
 
         graph_dto = self.get_graph()
         cys.graph_file_path = graph_dto.file_path
 
-        styles_dto = self.get_styles()
-        cys.styles_name = styles_dto.file_name
-        cys.styles_file_path = styles_dto.file_path
+        styles_dto = None
+        if with_styles != 0:
+            styles_dto = self.get_styles()
+            cys.styles_name = styles_dto.file_name
+            cys.styles_file_path = styles_dto.file_path
 
         self.lock.acquire()
         cys = self.create_cytoscape_session(cys)
@@ -83,4 +112,4 @@ class Handler:
 
         self.send_cytoscape_session(cys)
 
-        self.clean_work_dir(graph_dto, styles_dto, cys)
+        self.clean_work_dir(graph_dto, cys, styles_dto)
