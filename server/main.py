@@ -83,6 +83,7 @@ if __name__ == '__main__':
     host = config[connection_params]['host']
     port = int(config[connection_params]['port'])
     listeners_amount = int(config[connection_params]['listeners_amount'])
+    timeout_seconds = int(config[connection_params]['timeout_seconds'])
 
     logger.info(f'define host {host}')
     logger.info(f'define port {port}')
@@ -114,7 +115,6 @@ if __name__ == '__main__':
         try:
             conn, address = socket.accept()
             logger.info("accept connection from: " + str(address))
-            timeout_seconds = 60
             conn.settimeout(timeout_seconds)
 
         except sct.error as e:
