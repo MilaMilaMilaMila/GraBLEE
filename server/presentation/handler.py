@@ -2,6 +2,7 @@ import os
 from logging import Logger
 from socket import socket
 import threading
+import subprocess
 
 from business.models.datadto import DataDTO
 from business.models.session import Session
@@ -29,8 +30,8 @@ class Handler:
     def get_graph(self) -> DataDTO:
         self.logger.info('start saving graph data')
 
-        dto = DataDTO(object_type='GRAPH', file_format='cyjs')
-        zip_dto = DataDTO(object_type='GRAPH', file_format='cyjs.zip')
+        dto = DataDTO(object_type='GRAPH', file_format='gml')
+        zip_dto = DataDTO(object_type='GRAPH', file_format='gml.zip')
         zip_dto = self.transfer.get_data(self.conn, zip_dto)
         self.logger.info(f'archived graph data saved in {zip_dto.file_path}')
         dto_file_name = self.transfer.unzip(zip_dto.file_path)
@@ -56,8 +57,28 @@ class Handler:
 
         return dto
 
+    def get_layout(self) -> DataDTO:
+        self.logger.info('start saving layout data')
+
+        dto = DataDTO(object_type='LAYOUT', file_format='txt')
+        zip_dto = DataDTO(object_type='LAYOUT', file_format='txt.zip')
+        zip_dto = self.transfer.get_data(self.conn, zip_dto)
+        self.logger.info(f'archived layout data saved in {zip_dto.file_path}')
+        dto_file_name = self.transfer.unzip(zip_dto.file_path)
+        dto.file_name = zip_dto.file_name
+        dto.file_path = f'{dto.file_name}.{dto.file_format}'
+        self.logger.info(f'layout data saved in {dto.file_path}')
+        self.logger.info('finish saving layout data')
+
+        return dto
+
     def create_cytoscape_session(self, cys: Session) -> Session:
         self.logger.info('start creating cytoscape session')
+
+        self.logger.info('start applying OGDF layout')
+        exe_path = 'OGDF_LayoutService.exe'
+        subprocess.run([exe_path, cys.graph_file_path, cys.layout_file_path])
+        self.logger.info('finish applying OGDF layout')
 
         cys = self.cytoscape.create_cytoscape_session(cys)
 
@@ -73,17 +94,23 @@ class Handler:
 
         self.logger.info('finish sending cytoscape session')
 
-    def clean_work_dir(self, graph_dto: DataDTO, cys: Session, styles_dto=None):
+    def clean_work_dir(self, graph_dto: DataDTO, cys: Session, styles_dto=None, layout_dto=None):
         os.remove(graph_dto.file_path)
         os.remove(f'{graph_dto.file_path}.zip')
         if styles_dto:
             os.remove(styles_dto.file_path)
             os.remove(f'{styles_dto.file_path}.zip')
+        if styles_dto:
+            os.remove(layout_dto.file_path)
+            os.remove(f'{layout_dto.file_path}.zip')
         os.remove(cys.session_path)
         os.remove(f'{cys.session_path}.zip')
 
     def get_styles_status(self):
         return self.transfer.get_styles_status_data(self.conn)
+
+    def get_layout_status(self):
+        return self.transfer.get_layout_status_data(self.conn)
 
     def handle(self):
         conn_status = self.cytoscape.ping_cs()
@@ -94,6 +121,7 @@ class Handler:
             self.transfer.send_cytoscape_connection_status(self.conn, status=conn_status)
 
         with_styles = self.get_styles_status()
+        with_layout = self.get_layout_status()
 
         cys = Session()
 
@@ -106,10 +134,16 @@ class Handler:
             cys.styles_name = styles_dto.file_name
             cys.styles_file_path = styles_dto.file_path
 
+        layout_dto = None
+        if with_layout != 0:
+            layout_dto = self.get_layout()
+            cys.layout_file_name = layout_dto.file_name
+            cys.layout_file_path = layout_dto.file_path
+
         self.lock.acquire()
         cys = self.create_cytoscape_session(cys)
         self.lock.release()
 
         self.send_cytoscape_session(cys)
 
-        self.clean_work_dir(graph_dto, cys, styles_dto)
+        self.clean_work_dir(graph_dto, cys, styles_dto, layout_dto)

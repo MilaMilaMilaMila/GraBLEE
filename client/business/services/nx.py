@@ -62,7 +62,7 @@ class Networkx:
         self.logger.info('finish setting layout nodes positions to cyjs file')
 
     def complete_graph_as_cyjs(self, g: nx.Graph, file_format='cyjs', layout_algo='random') -> str:
-        self.logger.info('start completing graph as cyjs')
+        self.logger.info(f'start completing graph as cyjs')
 
         pos = self.get_layout_pos(g, layout_algo)
 
@@ -75,6 +75,19 @@ class Networkx:
         self.set_position_in_cyjs(file_name, pos)
 
         self.logger.info('finish completing graph as cyjs')
+        self.logger.info(f'write graph data in {full_file_name}')
+
+        return full_file_name
+
+    def complete_graph_as_gml(self, g: nx.Graph, file_format='gml') -> str:
+        self.logger.info(f'start completing graph as {file_format}')
+
+        file_name = f'graph_{datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
+        full_file_name = f'{file_name}.{file_format}'
+
+        nx.write_gml(g, full_file_name)
+
+        self.logger.info(f'finish completing graph as {file_format}')
         self.logger.info(f'write graph data in {full_file_name}')
 
         return full_file_name

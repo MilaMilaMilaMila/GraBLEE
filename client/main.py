@@ -39,7 +39,7 @@ def new_logger():
     return logger
 
 
-def main(self, cs_session_name=None, layout_algo='random', styles_filename=None):
+def main(self, cs_session_name=None, layout_algo=None, styles_filename=None):
     # define logger
     logger = new_logger()
 

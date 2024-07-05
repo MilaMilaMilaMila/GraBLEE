@@ -62,6 +62,9 @@ class Transfer:
     def send_styles_status_data(self, conn: socket, with_styles: int):
         self.send_data_len(conn, with_styles)
 
+    def send_layout_status_data(self, conn: socket, with_layout: int):
+        self.send_data_len(conn, with_layout)
+
     def get_data(self, conn: socket, file_path: str):
         data_len = self.get_data_len(conn)
 
@@ -83,7 +86,7 @@ class Transfer:
 
             FileSystemRepo.write_binary(file_path, batch)
             received_data_len += len(batch)
-            self.logger.debug(len(batch))
+            # self.logger.debug(len(batch))
 
         msg = f'received bytes: {received_data_len}'
         self.logger.info(msg)

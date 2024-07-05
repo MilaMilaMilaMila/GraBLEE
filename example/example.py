@@ -19,13 +19,15 @@ graph.add_edge(2, 3)
 graph.add_edge(3, 4)
 graph.add_edge(4, 5)
 graph.add_edge(5, 6)
+graph.add_edge(5, 3)
+graph.add_edge(4, 2)
+graph.add_edge(2, 6)
+graph.add_edge(6, 1)
 
-# с помощью этой части кода я создвала большие графы
-# for i in range(6, 100000):
-#     graph.add_edge(i, i + 1)
+# nx.write_gml(graph, 'test.gml')
 
 # get cytoscape session file in the current file directory
 graph.to_cytoscape_session(cs_session_name='session',
-                           layout_algo='circular',
+                           layout_algo='params.txt',
                            styles_filename='styles_red.xml'
                            )

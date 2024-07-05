@@ -100,6 +100,14 @@ class Transfer:
 
         return styles_status
 
+    def get_layout_status_data(self, conn: socket):
+        self.logger.info('start getting layout status data')
+        layout_status = self.get_data_len(conn)
+        self.logger.info(f'received status: {layout_status}')
+        self.logger.info('finish getting layout status data')
+
+        return layout_status
+
     def send_data(self, conn: socket, file_path: str):
         data = FileSystemRepo.read_binary(file_path)
         data_len = len(data)
@@ -110,7 +118,7 @@ class Transfer:
         for i in range(0, data_len, self.package_size):
             conn.send(data[i:min(i + self.package_size, data_len)])
             response = conn.recv(self.package_size).decode()
-            self.logger.debug(f'{response}')
+            # self.logger.debug(f'{response}')
 
             if response != 'ok':
                 self.logger.error('sending data batch error:')

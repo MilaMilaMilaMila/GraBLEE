@@ -5,3 +5,5 @@ class Session:
         self.styles_name = None
         self.styles_file_path = None
         self.graph_file_path = None
+        self.layout_file_name = None
+        self.layout_file_path = None
