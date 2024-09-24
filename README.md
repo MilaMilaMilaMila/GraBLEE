@@ -1,6 +1,6 @@
 # GraBLEE
 ## Программное обеспечение для автоматизации работы с  приложением Cytoscape
-Узнать о значимости и актуальности проекта, архитектурных решениях и использованных технологиях можно в документе summary.pdf(https://github.com/MilaMilaMilaMila/GraBLEE/blob/main/summary.pdf, https://docs.google.com/presentation/d/10iQkoLkNGChkdPLSD9VeaC_pcBWTWPEG/edit?usp=sharing&ouid=113384589332914961135&rtpof=true&sd=true) и в презентации grablee.pptx(https://github.com/MilaMilaMilaMila/GraBLEE/blob/main/grablee.pptx)
+Узнать о значимости и актуальности проекта, архитектурных решениях и использованных технологиях можно в документе summary.pdf(https://github.com/MilaMilaMilaMila/GraBLEE/blob/main/summary.pdf) и в презентации grablee.pptx(https://github.com/MilaMilaMilaMila/GraBLEE/blob/main/grablee.pptx, https://docs.google.com/presentation/d/10iQkoLkNGChkdPLSD9VeaC_pcBWTWPEG/edit?usp=sharing&ouid=113384589332914961135&rtpof=true&sd=true)
 
 # Как скачать необходимые зависимости
 
